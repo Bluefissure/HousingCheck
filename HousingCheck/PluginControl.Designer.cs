@@ -38,6 +38,7 @@ namespace HousingCheck
             this.checkBoxUpload = new System.Windows.Forms.CheckBox();
             this.groupBoxLog = new System.Windows.Forms.GroupBox();
             this.textBoxLog = new System.Windows.Forms.TextBox();
+            this.checkBoxML = new System.Windows.Forms.CheckBox();
             this.groupBoxTable.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.housingCheckBindingSource)).BeginInit();
@@ -67,6 +68,7 @@ namespace HousingCheck
             // 
             // groupBoxUpload
             // 
+            this.groupBoxUpload.Controls.Add(this.checkBoxML);
             this.groupBoxUpload.Controls.Add(this.textBoxUpload);
             this.groupBoxUpload.Controls.Add(this.checkBoxUpload);
             this.groupBoxUpload.Location = new System.Drawing.Point(685, 20);
@@ -116,6 +118,18 @@ namespace HousingCheck
             this.textBoxLog.Size = new System.Drawing.Size(307, 403);
             this.textBoxLog.TabIndex = 0;
             // 
+            // checkBoxML
+            // 
+            this.checkBoxML.AutoSize = true;
+            this.checkBoxML.Checked = true;
+            this.checkBoxML.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.checkBoxML.Location = new System.Drawing.Point(104, 20);
+            this.checkBoxML.Name = "checkBoxML";
+            this.checkBoxML.Size = new System.Drawing.Size(82, 17);
+            this.checkBoxML.TabIndex = 2;
+            this.checkBoxML.Text = "只上报M/L";
+            this.checkBoxML.UseVisualStyleBackColor = true;
+            // 
             // PluginControl
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -146,5 +160,6 @@ namespace HousingCheck
         private System.Windows.Forms.GroupBox groupBoxLog;
         public System.Windows.Forms.TextBox textBoxLog;
         public System.Windows.Forms.TextBox textBoxUpload;
+        public System.Windows.Forms.CheckBox checkBoxML;
     }
 }

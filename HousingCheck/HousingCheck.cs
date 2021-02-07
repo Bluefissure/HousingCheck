@@ -126,28 +126,36 @@ namespace HousingCheck
                             size,
                             price
                         ));
+                    if(size == "M" || size == "L")
+                    {
+                        Console.Beep(3000, 1000);
+                    }
                     try
                     {
                         if (control.upload)
                         {
-                            string urls = control.textBoxUpload.Text;
-                            foreach (string url in urls.Split('\n'))
+                            if(!control.checkBoxML.Checked || (size == "M" || size == "L"))
                             {
-                                string post_url = url.Trim();
-                                if (post_url == "") continue;
-                                Log("Info", $"上报消息给 {post_url}");
-                                var wb = new WebClient();
-                                var data = new NameValueCollection
+                                string urls = control.textBoxUpload.Text;
+                                foreach (string url in urls.Split('\n'))
+                                {
+                                    string post_url = url.Trim();
+                                    if (post_url == "") continue;
+                                    Log("Info", $"上报消息给 {post_url}");
+                                    var wb = new WebClient();
+                                    var data = new NameValueCollection
                                     {
                                         { "text", text }
                                     };
-                                var response = wb.UploadValues(post_url, "POST", data);
-                                string responseInString = Encoding.UTF8.GetString(response);
-                                if(responseInString == "OK")
-                                    Log("Info", "上报成功");
-                                else
-                                    Log("Error", "上报失败");
+                                    var response = wb.UploadValues(post_url, "POST", data);
+                                    string responseInString = Encoding.UTF8.GetString(response);
+                                    if (responseInString == "OK")
+                                        Log("Info", "上报成功");
+                                    else
+                                        Log("Error", "上报失败");
+                                }
                             }
+                            
                         }
                     }
                     catch (Exception e)
