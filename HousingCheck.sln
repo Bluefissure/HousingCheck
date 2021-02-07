@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30804.86
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HousingCheck", "HousingCheck\HousingCheck.csproj", "{09CF833E-9688-47F5-A9BF-881AC318CC80}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{09CF833E-9688-47F5-A9BF-881AC318CC80}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{09CF833E-9688-47F5-A9BF-881AC318CC80}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{09CF833E-9688-47F5-A9BF-881AC318CC80}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{09CF833E-9688-47F5-A9BF-881AC318CC80}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {5FBB6104-1540-4CCC-8DB3-562B26056A88}
+	EndGlobalSection
+EndGlobal
