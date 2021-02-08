@@ -12,6 +12,8 @@ using FFXIV_ACT_Plugin.Common;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using System.Net;
+using System.Threading;
+using System.ComponentModel;
 using System.Collections.Specialized;
 
 public static class Extensions
@@ -26,7 +28,6 @@ public static class Extensions
 
 namespace HousingCheck
 {
-
     
     public class HousingCheck : IActPluginV1
     {
@@ -34,6 +35,9 @@ namespace HousingCheck
         public BindingSource bindingSource1;
         FFXIV_ACT_Plugin.FFXIV_ACT_Plugin ffxivPlugin;
         bool initialized = false;
+        bool OtterUploadFlag = false;       
+        string OtterText = "";      //上报队列
+        private BackgroundWorker OtterThread;
         Label statusLabel;
         PluginControl control;
         private object GetFfxivPlugin()
@@ -59,6 +63,7 @@ namespace HousingCheck
                 var networkReceivedDelegateType = typeof(NetworkReceivedDelegate);
                 var networkReceivedDelegate = Delegate.CreateDelegate(networkReceivedDelegateType, (object)this, "NetworkReceived", true);
                 subs.GetType().GetEvent("NetworkReceived").RemoveEventHandler(subs, networkReceivedDelegate);
+                OtterThread.CancelAsync();
                 statusLabel.Text = "Exit :|";
             }
             else
@@ -81,9 +86,17 @@ namespace HousingCheck
             var networkReceivedDelegateType = typeof(NetworkReceivedDelegate);
             var networkReceivedDelegate = Delegate.CreateDelegate(networkReceivedDelegateType, (object)this, "NetworkReceived", true);
             subs.GetType().GetEvent("NetworkReceived").AddEventHandler(subs, networkReceivedDelegate);
-            statusLabel.Text = "Working :D";
             initialized = true;
+            OtterThread = new BackgroundWorker
+            {
+                WorkerSupportsCancellation = true
+            };
+            OtterThread.DoWork += OtterUpload;
+            OtterThread.RunWorkerAsync();
+            statusLabel.Text = "Working :D";
+
         }
+
 
         private void AddMessageToTextBoxLog(string line)
         {
@@ -125,7 +138,7 @@ namespace HousingCheck
                 var name_array = data_list.SubArray(i + 8, 32);
                 if (name_array[0] == 0)
                 {
-                    string text = $"{area} 第{slot + 1}区 {house_id + 1}号 {size}房在售 当前价格:{price}";
+                    string text = $"{area} 第{slot + 1}区 {house_id + 1}号 {size}房在售 当前价格:{price}{Environment.NewLine}";
                     Log("Info", text);
                     var housignItem = new HousingItem(
                             area,
@@ -146,41 +159,63 @@ namespace HousingCheck
                     {
                         Console.Beep(3000, 1000);
                     }
-                    try
+                    if (control.upload)
                     {
-                        if (control.upload)
+                        if (!control.checkBoxML.Checked || (size == "M" || size == "L"))
                         {
-                            if(!control.checkBoxML.Checked || (size == "M" || size == "L"))
-                            {
-                                string urls = control.textBoxUpload.Text;
-                                foreach (string url in urls.Split('\n'))
-                                {
-                                    string post_url = url.Trim();
-                                    if (post_url == "") continue;
-                                    Log("Info", $"上报消息给 {post_url}");
-                                    var wb = new WebClient();
-                                    var data = new NameValueCollection
-                                    {
-                                        { "text", text }
-                                    };
-                                    var response = wb.UploadValues(post_url, "POST", data);
-                                    string responseInString = Encoding.UTF8.GetString(response);
-                                    if (responseInString == "OK")
-                                        Log("Info", "上报成功");
-                                    else
-                                        Log("Error", "上报失败");
-                                }
-                            }
-                            
+                            OtterText += text;
+                            OtterUploadFlag = true;
                         }
+
                     }
-                    catch (Exception e)
-                    {
-                        Log("Error", "上报失败: " + e.Message);
-                    }
+
 
                 }
             }
         }
+
+        private void OtterUpload(object sender, DoWorkEventArgs e)
+        {
+            if (OtterUploadFlag)
+            {
+                try
+                {
+                    string urls = control.textBoxUpload.Text;
+                    foreach (string url in urls.Split('\n'))
+                    {
+                        string post_url = url.Trim();
+                        if (post_url == "") continue;
+                        Log("Info", $"上报消息给 {post_url}");
+                        var wb = new WebClient();
+                        var data = new NameValueCollection
+                            {
+                                { "text", OtterText }
+                            };
+                        var response = wb.UploadValues(post_url, "POST", data);
+                        string responseInString = Encoding.UTF8.GetString(response);
+                        if (responseInString == "OK")
+                        {
+                            OtterText = "";
+                            OtterUploadFlag = false;
+                            Log("Info", "上报成功");
+                        }
+                        else
+                        {
+                            Log("Error", "上报失败");
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Log("Error", "上报失败: " + ex.Message);
+                }
+                Thread.Sleep(5100);
+            }
+            else
+            {
+                Thread.Sleep(300);
+            }    
+        }
+
     }
 }
