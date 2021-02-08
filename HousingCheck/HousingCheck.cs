@@ -71,25 +71,33 @@ namespace HousingCheck
         {
             statusLabel = pluginStatusText;
             GetFfxivPlugin();
-            var subs = ffxivPlugin.GetType().GetProperty("DataSubscription").GetValue(ffxivPlugin, null);
-            var networkReceivedDelegateType = typeof(NetworkReceivedDelegate);
-            var networkReceivedDelegate = Delegate.CreateDelegate(networkReceivedDelegateType, (object)this, "NetworkReceived", true);
-            subs.GetType().GetEvent("NetworkReceived").AddEventHandler(subs, networkReceivedDelegate);
             control = new PluginControl();
             pluginScreenSpace.Text = "Housing Check";
             bindingSource1 = new BindingSource { DataSource = HousingList };
             control.dataGridView1.DataSource = bindingSource1;
             pluginScreenSpace.Controls.Add(control);
+
+            var subs = ffxivPlugin.GetType().GetProperty("DataSubscription").GetValue(ffxivPlugin, null);
+            var networkReceivedDelegateType = typeof(NetworkReceivedDelegate);
+            var networkReceivedDelegate = Delegate.CreateDelegate(networkReceivedDelegateType, (object)this, "NetworkReceived", true);
+            subs.GetType().GetEvent("NetworkReceived").AddEventHandler(subs, networkReceivedDelegate);
             statusLabel.Text = "Working :D";
             initialized = true;
         }
 
+        private void AddMessageToTextBoxLog(string line)
+        {
+            List<string> lines = new List<string>();
+            lines.AddRange(control.textBoxLog.Lines);
+            lines.Add(line);
+            control.textBoxLog.Lines = lines.ToArray();
+            control.textBoxLog.Refresh();
+        }
         void Log(string type, string message)
         {
             var time = (DateTime.Now).ToString("HH:mm:ss");
             var text = $"[{time}] [{type}] {message}";
-            control.textBoxLog.AppendText(text);
-            control.textBoxLog.AppendText(Environment.NewLine);
+            AddMessageToTextBoxLog(text);
         }
 
         void NetworkReceived(string connection, long epoch, byte[] message)
@@ -119,13 +127,21 @@ namespace HousingCheck
                 {
                     string text = $"{area} 第{slot + 1}区 {house_id + 1}号 {size}房在售 当前价格:{price}";
                     Log("Info", text);
-                    bindingSource1.Add(new HousingItem(
+                    var housignItem = new HousingItem(
                             area,
                             slot + 1,
                             house_id + 1,
                             size,
                             price
-                        ));
+                        );
+                    if(HousingList.IndexOf(housignItem) == -1)
+                    {
+                        bindingSource1.Add(housignItem);
+                    }
+                    else
+                    {
+                        Log("Info", "重复土地，已过滤。");
+                    }
                     if(size == "M" || size == "L")
                     {
                         Console.Beep(3000, 1000);
