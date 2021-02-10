@@ -7,12 +7,16 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Xml;
+using System.IO;
+using Advanced_Combat_Tracker;
 
 namespace HousingCheck
 {
     public partial class PluginControl : UserControl
     {
 
+        private static readonly string SettingsFile = Path.Combine(ActGlobals.oFormActMain.AppDataFolder.FullName, "Config\\HousingCheck.config.xml");
         public bool upload;
         public PluginControl()
         {
@@ -25,6 +29,32 @@ namespace HousingCheck
             upload = checkBox.Checked;
             this.textBoxUpload.ReadOnly = !upload;
             this.textBoxUpload.Enabled = upload;
+        }
+
+        public void LoadSettings()
+        {
+            if (File.Exists(SettingsFile))
+            {
+                XmlDocument xdo = new XmlDocument();
+                xdo.Load(SettingsFile);
+                XmlNode head = xdo.SelectSingleNode("Config");
+                textBoxUpload.Text = head?.SelectSingleNode("OtterURL")?.InnerText;
+                checkBoxUpload.Checked = bool.Parse(head?.SelectSingleNode("AutoStart")?.InnerText ?? "false");
+            }
+
+        }
+        public void SaveSettings()
+        {
+            FileStream fs = new FileStream(SettingsFile, FileMode.Create, FileAccess.Write, FileShare.ReadWrite);
+            XmlTextWriter xWriter = new XmlTextWriter(fs, Encoding.UTF8) { Formatting = Formatting.Indented, Indentation = 1, IndentChar = '\t' };
+            xWriter.WriteStartDocument(true);
+            xWriter.WriteStartElement("Config");    // <Config>
+            xWriter.WriteElementString("OtterURL", textBoxUpload.Text);
+            xWriter.WriteElementString("AutoStart", checkBoxUpload.Checked.ToString());
+            xWriter.WriteEndElement();              // </Config>
+            xWriter.WriteEndDocument();             // Tie up loose ends (shouldn't be any)
+            xWriter.Flush();                        // Flush the file buffer to disk
+            xWriter.Close();
         }
     }
 }
