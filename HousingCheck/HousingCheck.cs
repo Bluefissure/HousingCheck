@@ -16,6 +16,7 @@ using System.Threading;
 using System.ComponentModel;
 using System.Collections.Specialized;
 using System.Xml;
+using System.Collections.ObjectModel;
 
 public static class Extensions
 {
@@ -32,7 +33,7 @@ namespace HousingCheck
     
     public class HousingCheck : IActPluginV1
     {
-        public List<HousingItem> HousingList = new List<HousingItem>();
+        public ObservableCollection<HousingItem> HousingList = new ObservableCollection<HousingItem>();
         public BindingSource bindingSource1;
         FFXIV_ACT_Plugin.FFXIV_ACT_Plugin ffxivPlugin;
         bool initialized = false;
@@ -101,19 +102,13 @@ namespace HousingCheck
         }
 
 
-        private void AddMessageToTextBoxLog(string line)
-        {
-            List<string> lines = new List<string>();
-            lines.AddRange(control.textBoxLog.Lines);
-            lines.Add(line);
-            control.textBoxLog.Lines = lines.ToArray();
-            control.textBoxLog.Refresh();
-        }
         void Log(string type, string message)
         {
             var time = (DateTime.Now).ToString("HH:mm:ss");
-            var text = $"[{time}] [{type}] {message}";
-            AddMessageToTextBoxLog(text);
+            var text = $"[{time}] [{type}] {message.Trim()}";
+            control.textBoxLog.Text += text + Environment.NewLine;
+            control.textBoxLog.SelectionStart = control.textBoxLog.TextLength;
+            control.textBoxLog.ScrollToCaret();
         }
 
         void NetworkReceived(string connection, long epoch, byte[] message)
@@ -141,7 +136,7 @@ namespace HousingCheck
                 var name_array = data_list.SubArray(i + 8, 32);
                 if (name_array[0] == 0)
                 {
-                    string text = $"{area} 第{slot + 1}区 {house_id + 1}号 {size}房在售 当前价格:{price}{Environment.NewLine}";
+                    string text = $"{area} 第{slot + 1}区 {house_id + 1}号 {size}房在售 当前价格:{price} {Environment.NewLine}";
                     Log("Info", text);
                     var housignItem = new HousingItem(
                             area,

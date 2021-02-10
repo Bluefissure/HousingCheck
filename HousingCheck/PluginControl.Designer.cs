@@ -34,11 +34,11 @@ namespace HousingCheck
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
             this.housingCheckBindingSource = new System.Windows.Forms.BindingSource(this.components);
             this.groupBoxUpload = new System.Windows.Forms.GroupBox();
+            this.checkBoxML = new System.Windows.Forms.CheckBox();
             this.textBoxUpload = new System.Windows.Forms.TextBox();
             this.checkBoxUpload = new System.Windows.Forms.CheckBox();
             this.groupBoxLog = new System.Windows.Forms.GroupBox();
             this.textBoxLog = new System.Windows.Forms.TextBox();
-            this.checkBoxML = new System.Windows.Forms.CheckBox();
             this.groupBoxTable.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.housingCheckBindingSource)).BeginInit();
@@ -79,6 +79,18 @@ namespace HousingCheck
             this.groupBoxUpload.TabStop = false;
             this.groupBoxUpload.Text = "上报设置";
             // 
+            // checkBoxML
+            // 
+            this.checkBoxML.AutoSize = true;
+            this.checkBoxML.Checked = true;
+            this.checkBoxML.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.checkBoxML.Location = new System.Drawing.Point(104, 20);
+            this.checkBoxML.Name = "checkBoxML";
+            this.checkBoxML.Size = new System.Drawing.Size(82, 17);
+            this.checkBoxML.TabIndex = 2;
+            this.checkBoxML.Text = "只上报M/L";
+            this.checkBoxML.UseVisualStyleBackColor = true;
+            // 
             // textBoxUpload
             // 
             this.textBoxUpload.Enabled = false;
@@ -116,20 +128,9 @@ namespace HousingCheck
             this.textBoxLog.Multiline = true;
             this.textBoxLog.Name = "textBoxLog";
             this.textBoxLog.ReadOnly = true;
+            this.textBoxLog.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this.textBoxLog.Size = new System.Drawing.Size(307, 403);
             this.textBoxLog.TabIndex = 0;
-            // 
-            // checkBoxML
-            // 
-            this.checkBoxML.AutoSize = true;
-            this.checkBoxML.Checked = true;
-            this.checkBoxML.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.checkBoxML.Location = new System.Drawing.Point(104, 20);
-            this.checkBoxML.Name = "checkBoxML";
-            this.checkBoxML.Size = new System.Drawing.Size(82, 17);
-            this.checkBoxML.TabIndex = 2;
-            this.checkBoxML.Text = "只上报M/L";
-            this.checkBoxML.UseVisualStyleBackColor = true;
             // 
             // PluginControl
             // 
