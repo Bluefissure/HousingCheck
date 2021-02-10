@@ -213,6 +213,7 @@ namespace HousingCheck
                                 Log("Error", "上报失败");
                             }
                         }
+
                     }
                     catch (Exception ex)
                     {
@@ -223,6 +224,8 @@ namespace HousingCheck
                 else
                 {
                     Thread.Sleep(300);
+
+
                 }
             }
         }
