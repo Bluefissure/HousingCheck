@@ -39,7 +39,8 @@ namespace HousingCheck
                 xdo.Load(SettingsFile);
                 XmlNode head = xdo.SelectSingleNode("Config");
                 textBoxUpload.Text = head?.SelectSingleNode("OtterURL")?.InnerText;
-                checkBoxUpload.Checked = bool.Parse(head?.SelectSingleNode("AutoStart")?.InnerText ?? "false");
+                checkBoxUpload.Checked = bool.Parse(head?.SelectSingleNode("AutoUpload")?.InnerText ?? "false");
+                checkBoxML.Checked = bool.Parse(head?.SelectSingleNode("ML")?.InnerText ?? "true");
             }
 
         }
@@ -50,7 +51,8 @@ namespace HousingCheck
             xWriter.WriteStartDocument(true);
             xWriter.WriteStartElement("Config");    // <Config>
             xWriter.WriteElementString("OtterURL", textBoxUpload.Text);
-            xWriter.WriteElementString("AutoStart", checkBoxUpload.Checked.ToString());
+            xWriter.WriteElementString("AutoUpload", checkBoxUpload.Checked.ToString());
+            xWriter.WriteElementString("ML", checkBoxML.Checked.ToString());
             xWriter.WriteEndElement();              // </Config>
             xWriter.WriteEndDocument();             // Tie up loose ends (shouldn't be any)
             xWriter.Flush();                        // Flush the file buffer to disk

@@ -3,7 +3,7 @@ using System.IO;
 using System.Drawing;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
-using System.Collections.Generic;
+using System.Collections;
 using System.Linq;
 using System.Text;
 using Advanced_Combat_Tracker;
@@ -99,6 +99,9 @@ namespace HousingCheck
             OtterThread.RunWorkerAsync();
             statusLabel.Text = "Working :D";
             control.LoadSettings();
+            control.buttonUploadOnce.Click += ButtonUploadOnce_Click;
+            control.buttonCopyToClipboard.Click += ButtonCopyToClipboard_Click;
+            control.buttonSaveToFile.Click += ButtonSaveToFile_Click;
         }
 
 
@@ -108,7 +111,9 @@ namespace HousingCheck
             var text = $"[{time}] [{type}] {message.Trim()}";
             control.textBoxLog.Text += text + Environment.NewLine;
             control.textBoxLog.SelectionStart = control.textBoxLog.TextLength;
-            control.textBoxLog.ScrollToCaret();
+            control.textBoxLog.ScrollToCaret(); 
+            text = $"00|{DateTime.Now.ToString("O")}|0|HousingCheck-{message}|";        //解析插件数据格式化
+            ActGlobals.oFormActMain.ParseRawLogLine(false, DateTime.Now, $"{text}");    //插入ACT日志
         }
 
         void NetworkReceived(string connection, long epoch, byte[] message)
@@ -151,7 +156,9 @@ namespace HousingCheck
                     }
                     else
                     {
-                        Log("Info", "重复土地，已过滤。");
+                        HousingList[HousingList.IndexOf(housignItem)].ExistenceTime = DateTime.Now;     //更新时间
+                        HousingList[HousingList.IndexOf(housignItem)].Price = price;                    //更新价格
+                        Log("Info", "重复土地，已更新。");
                     }
                     if(size == "M" || size == "L")
                     {
@@ -164,12 +171,67 @@ namespace HousingCheck
                             OtterText += text;
                             OtterUploadFlag = true;
                         }
-
                     }
-
-
                 }
             }
+            Log("Info", $"查询第{slot + 1}区");     //输出翻页日志
+        }
+
+        private void ButtonUploadOnce_Click(object sender, EventArgs e)
+        {
+            Log("Info", $"准备上报");
+            OtterText = ListToString();
+            OtterUploadFlag = true;
+        }
+
+        private void ButtonCopyToClipboard_Click(object sender, EventArgs e)
+        {
+            Clipboard.SetText(ListToString());
+            Log("Info", $"复制成功");
+        }
+
+        private void ButtonSaveToFile_Click(object sender, EventArgs e)
+        {
+            string fileName = $"HousingCheck-{DateTime.Now.ToString("u").Replace(":", "").Replace(" ", "").Replace("-", "")}.txt";
+            File.AppendAllText(
+                Path.Combine(Environment.CurrentDirectory, fileName),   //ACT根目录
+                ListToString()
+                );
+            Log("Info", $"已保存到{Environment.CurrentDirectory}, {fileName}");
+            //Log("Debug", fileName);
+        }
+
+        private string ListToString()
+        {
+            ArrayList area = new ArrayList(new string[] { "海雾村", "薰衣草苗圃", "高脚孤丘", "白银乡" });
+            StringBuilder stringBuilder = new StringBuilder();
+            foreach (var line in HousingList)
+            {
+                stringBuilder.Append($"{line.Area} 第{line.Slot}区 {line.Id}号{line.Size}房在售，当前价格:{line.Price} {Environment.NewLine}");
+
+                if (line.Area == "海雾村" && area.IndexOf("海雾村") != -1)
+                {
+                    area.Remove("海雾村");
+                }
+                else if (line.Area == "薰衣草苗圃" && area.IndexOf("薰衣草苗圃") != -1)
+                {
+                    area.Remove("薰衣草苗圃");
+                }
+                else if (line.Area == "高脚孤丘" && area.IndexOf("高脚孤丘") != -1)
+                {
+                    area.Remove("高脚孤丘");
+                }
+                else if (line.Area == "白银乡" && area.IndexOf("白银乡") != -1)
+                {
+                    area.Remove("白银乡");
+                }
+            }
+            foreach (var line in area)
+            {
+                stringBuilder.Append($"{line} 无空房 {Environment.NewLine}");
+            }
+
+            return stringBuilder.ToString();
         }
 
         private void OtterUpload(object sender, DoWorkEventArgs e)
@@ -219,8 +281,6 @@ namespace HousingCheck
                 else
                 {
                     Thread.Sleep(300);
-
-
                 }
             }
         }
