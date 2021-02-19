@@ -17,6 +17,7 @@ namespace HousingCheck
             Size = _size;
             Price = _price;
             AddTime = DateTime.Now;
+            ExistenceTime = DateTime.Now;
         }
 
 
@@ -30,8 +31,10 @@ namespace HousingCheck
         public string Size { get; set; }
         [DisplayName("价格")]
         public int Price { get; set; }
-        [DisplayName("记录时间")]
+        [DisplayName("首次记录时间")]
         public DateTime AddTime { get; set; }
+        [DisplayName("最后记录时间")]
+        public DateTime ExistenceTime { get; set; }
 
         public bool Equals(HousingItem obj)
         {

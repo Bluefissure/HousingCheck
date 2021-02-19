@@ -30,6 +30,9 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <RunPostBuildEvent>Always</RunPostBuildEvent>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="Advanced Combat Tracker">
       <HintPath>..\..\HouseCheck\HouseCheck\Advanced Combat Tracker.dll</HintPath>
@@ -78,4 +81,7 @@
     <None Include="Properties\DataSources\PluginControl.datasource" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>xcopy C:\Users\Stormkeeper\source\repos\HousingCheck\HousingCheck\bin\Release F:\Test\FFXIV\ACT\Plugins\HousingCheck  /y</PostBuildEvent>
+  </PropertyGroup>
 </Project>
