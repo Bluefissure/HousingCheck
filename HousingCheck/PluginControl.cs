@@ -21,6 +21,7 @@ namespace HousingCheck
         public PluginControl()
         {
             InitializeComponent();
+            numericUpDownTimeout.Location = new Point(label1.Location.X + label1.Width, numericUpDownTimeout.Location.Y);
         }
 
         private void checkBoxUpload_CheckedChanged(object sender, EventArgs e)
@@ -41,6 +42,7 @@ namespace HousingCheck
                 textBoxUpload.Text = head?.SelectSingleNode("OtterURL")?.InnerText;
                 checkBoxUpload.Checked = bool.Parse(head?.SelectSingleNode("AutoUpload")?.InnerText ?? "false");
                 checkBoxML.Checked = bool.Parse(head?.SelectSingleNode("ML")?.InnerText ?? "true");
+                numericUpDownTimeout.Value = decimal.Parse(head?.SelectSingleNode("Timeout")?.InnerText ?? "45");
             }
 
         }
@@ -53,6 +55,7 @@ namespace HousingCheck
             xWriter.WriteElementString("OtterURL", textBoxUpload.Text);
             xWriter.WriteElementString("AutoUpload", checkBoxUpload.Checked.ToString());
             xWriter.WriteElementString("ML", checkBoxML.Checked.ToString());
+            xWriter.WriteElementString("Timeout", numericUpDownTimeout.Value.ToString());
             xWriter.WriteEndElement();              // </Config>
             xWriter.WriteEndDocument();             // Tie up loose ends (shouldn't be any)
             xWriter.Flush();                        // Flush the file buffer to disk

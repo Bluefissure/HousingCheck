@@ -41,7 +41,8 @@ namespace HousingCheck
         string OtterText = "";      //上报队列
         private BackgroundWorker OtterThread;
         Label statusLabel;
-        PluginControl control; 
+        PluginControl control;
+
 
         private object GetFfxivPlugin()
         {
@@ -54,7 +55,7 @@ namespace HousingCheck
                     ffxivPlugin = (FFXIV_ACT_Plugin.FFXIV_ACT_Plugin)plugin.pluginObj;
 
             if (ffxivPlugin == null)
-                throw new Exception("Could not find FFXIV plugin. Make sure that it is loaded before CutsceneSkip.");
+                throw new Exception("Could not find FFXIV plugin. Make sure that it is loaded before HousingCheck.");
 
             return ffxivPlugin;
         }
@@ -205,8 +206,15 @@ namespace HousingCheck
         {
             ArrayList area = new ArrayList(new string[] { "海雾村", "薰衣草苗圃", "高脚孤丘", "白银乡" });
             StringBuilder stringBuilder = new StringBuilder();
+            
             foreach (var line in HousingList)
             {
+                bool isExistence = DateTime.Compare(line.ExistenceTime.AddMinutes((double)control.numericUpDownTimeout.Value), DateTime.Now) <= 0;
+                if (isExistence && control.numericUpDownTimeout.Value != 0)
+                {
+                    continue;
+                }
+
                 stringBuilder.Append($"{line.Area} 第{line.Slot}区 {line.Id}号{line.Size}房在售，当前价格:{line.Price} {Environment.NewLine}");
 
                 if (line.Area == "海雾村" && area.IndexOf("海雾村") != -1)
