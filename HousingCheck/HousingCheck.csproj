@@ -9,9 +9,10 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>HousingCheck</RootNamespace>
     <AssemblyName>HousingCheck</AssemblyName>
-    <TargetFrameworkVersion>v4.7</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -35,17 +36,36 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Advanced Combat Tracker">
-      <HintPath>..\..\HouseCheck\HouseCheck\Advanced Combat Tracker.dll</HintPath>
+      <HintPath>E:\Games\ACT\Advanced Combat Tracker.dll</HintPath>
     </Reference>
     <Reference Include="FFXIV_ACT_Plugin">
-      <HintPath>..\..\HouseCheck\HouseCheck\FFXIV_ACT_Plugin.dll</HintPath>
+      <HintPath>..\lib\FFXIV_ACT_Plugin.dll</HintPath>
     </Reference>
     <Reference Include="FFXIV_ACT_Plugin.Common">
-      <HintPath>..\..\HouseCheck\HouseCheck\FFXIV_ACT_Plugin.Common.dll</HintPath>
+      <HintPath>..\lib\SDK\FFXIV_ACT_Plugin.Common.dll</HintPath>
     </Reference>
     <Reference Include="FFXIV_ACT_Plugin.Config">
-      <HintPath>..\..\..\..\ACTv3\Plugins\SDK_2.0.5.10\FFXIV_ACT_Plugin.Config.dll</HintPath>
+      <HintPath>..\lib\SDK\FFXIV_ACT_Plugin.Config.dll</HintPath>
     </Reference>
+    <Reference Include="FFXIV_ACT_Plugin.LogFile">
+      <HintPath>..\lib\SDK\FFXIV_ACT_Plugin.LogFile.dll</HintPath>
+    </Reference>
+    <Reference Include="FFXIV_ACT_Plugin.Memory">
+      <HintPath>..\lib\SDK\FFXIV_ACT_Plugin.Memory.dll</HintPath>
+    </Reference>
+    <Reference Include="FFXIV_ACT_Plugin.Network">
+      <HintPath>..\lib\SDK\FFXIV_ACT_Plugin.Network.dll</HintPath>
+    </Reference>
+    <Reference Include="FFXIV_ACT_Plugin.Overlay">
+      <HintPath>..\lib\SDK\FFXIV_ACT_Plugin.Overlay.dll</HintPath>
+    </Reference>
+    <Reference Include="FFXIV_ACT_Plugin.Parse">
+      <HintPath>..\lib\SDK\FFXIV_ACT_Plugin.Parse.dll</HintPath>
+    </Reference>
+    <Reference Include="FFXIV_ACT_Plugin.Resource">
+      <HintPath>..\lib\SDK\FFXIV_ACT_Plugin.Resource.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
@@ -61,7 +81,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="HousingCheck.cs" />
+    <Compile Include="HousingOnSaleItem.cs" />
     <Compile Include="HousingItem.cs" />
+    <Compile Include="HousingSlotSnapshot.cs" />
+    <Compile Include="HousingSnapshotStorage.cs" />
     <Compile Include="PluginControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -76,6 +99,7 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <None Include="packages.config" />
     <None Include="Properties\DataSources\Extensions.datasource" />
     <None Include="Properties\DataSources\HousingCheck.datasource" />
     <None Include="Properties\DataSources\PluginControl.datasource" />
