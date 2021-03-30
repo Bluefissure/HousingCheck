@@ -192,6 +192,7 @@ namespace HousingCheck
                     HousingListUpdated = true;
                 }
                 LastOperateTime = new DateTimeOffset(DateTime.Now).ToUnixTimeSeconds(); //更新上次操作的时间
+                bindingSource1.ResetBindings(false); //刷新列表
                 Log("Info", string.Format("{0} 第{1}区查询完成",
                     HousingItem.GetHouseAreaStr(snapshot.Area),
                     snapshot.Slot + 1));     //输出翻页日志

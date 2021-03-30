@@ -111,7 +111,7 @@ namespace HousingCheck
             this.checkBoxUploadSnapshot.Checked = true;
             this.checkBoxUploadSnapshot.CheckState = System.Windows.Forms.CheckState.Checked;
             this.checkBoxUploadSnapshot.Enabled = false;
-            this.checkBoxUploadSnapshot.Location = new System.Drawing.Point(144, 36);
+            this.checkBoxUploadSnapshot.Location = new System.Drawing.Point(154, 36);
             this.checkBoxUploadSnapshot.Name = "checkBoxUploadSnapshot";
             this.checkBoxUploadSnapshot.Size = new System.Drawing.Size(121, 24);
             this.checkBoxUploadSnapshot.TabIndex = 7;
