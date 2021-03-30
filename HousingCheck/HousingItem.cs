@@ -111,6 +111,7 @@ namespace HousingCheck
         public bool isPersonal;
         public bool isEmpty;
         public bool isPublic;
+        public bool hasGreeting;
     }
 
     public class HousingItem
@@ -326,6 +327,7 @@ namespace HousingCheck
             ret.isPersonal = OwnerType == HouseOwnerType.PERSON;
             ret.isEmpty = IsEmpty;
             ret.isPublic = Access == HouseAccess.PUBLIC;
+            ret.hasGreeting = Flags.HasEstateGreeting;
             return ret;
         }
     }

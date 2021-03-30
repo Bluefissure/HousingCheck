@@ -1,11 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Xml;
 using System.IO;
@@ -27,8 +21,15 @@ namespace HousingCheck
         {
             CheckBox checkBox = (CheckBox)sender;
             upload = checkBox.Checked;
+
             this.textBoxUpload.ReadOnly = !upload;
             this.textBoxUpload.Enabled = upload;
+
+            this.textBoxUploadToken.ReadOnly = !upload;
+            this.textBoxUploadToken.Enabled = upload;
+
+            this.checkBoxML.Enabled = upload;
+            this.checkBoxUploadSnapshot.Enabled = upload;
         }
 
         public void LoadSettings()
@@ -38,9 +39,11 @@ namespace HousingCheck
                 XmlDocument xdo = new XmlDocument();
                 xdo.Load(SettingsFile);
                 XmlNode head = xdo.SelectSingleNode("Config");
-                textBoxUpload.Text = head?.SelectSingleNode("OtterURL")?.InnerText;
+                textBoxUpload.Text = head?.SelectSingleNode("UploadURL")?.InnerText;
+                textBoxUploadToken.Text = head?.SelectSingleNode("UploadToken")?.InnerText;
                 checkBoxUpload.Checked = bool.Parse(head?.SelectSingleNode("AutoUpload")?.InnerText ?? "false");
-                checkBoxML.Checked = bool.Parse(head?.SelectSingleNode("ML")?.InnerText ?? "true");
+                checkBoxML.Checked = bool.Parse(head?.SelectSingleNode("UploadMLOnly")?.InnerText ?? "true");
+                checkBoxUploadSnapshot.Checked = bool.Parse(head?.SelectSingleNode("UploadSnapshot")?.InnerText ?? "true");
             }
 
         }
@@ -50,13 +53,25 @@ namespace HousingCheck
             XmlTextWriter xWriter = new XmlTextWriter(fs, Encoding.UTF8) { Formatting = Formatting.Indented, Indentation = 1, IndentChar = '\t' };
             xWriter.WriteStartDocument(true);
             xWriter.WriteStartElement("Config");    // <Config>
-            xWriter.WriteElementString("OtterURL", textBoxUpload.Text);
+            xWriter.WriteElementString("UploadURL", textBoxUpload.Text);
+            xWriter.WriteElementString("UploadToken", textBoxUploadToken.Text);
             xWriter.WriteElementString("AutoUpload", checkBoxUpload.Checked.ToString());
-            xWriter.WriteElementString("ML", checkBoxML.Checked.ToString());
+            xWriter.WriteElementString("UploadMLOnly", checkBoxML.Checked.ToString());
+            xWriter.WriteElementString("UploadSnapshot", checkBoxUploadSnapshot.Checked.ToString());
             xWriter.WriteEndElement();              // </Config>
             xWriter.WriteEndDocument();             // Tie up loose ends (shouldn't be any)
             xWriter.Flush();                        // Flush the file buffer to disk
             xWriter.Close();
+        }
+
+        private void label1_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void textBoxUpload_TextChanged(object sender, EventArgs e)
+        {
+
         }
     }
 }

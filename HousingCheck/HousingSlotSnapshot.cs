@@ -31,6 +31,8 @@ namespace HousingCheck
         /// <param name="message"></param>
         public HousingSlotSnapshot(byte[] message)
         {
+            Time = DateTime.Now;
+
             var dataList = message.SubArray(32, message.Length - 32);
             var dataHeader = dataList.SubArray(0, 8);
             switch (dataHeader[4])
