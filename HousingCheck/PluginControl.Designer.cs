@@ -34,8 +34,11 @@ namespace HousingCheck
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
             this.housingCheckBindingSource = new System.Windows.Forms.BindingSource(this.components);
             this.groupBoxUpload = new System.Windows.Forms.GroupBox();
+            this.checkBoxUploadSnapshot = new System.Windows.Forms.CheckBox();
+            this.label3 = new System.Windows.Forms.Label();
+            this.textBoxUploadToken = new System.Windows.Forms.TextBox();
+            this.label2 = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
-            this.checkBoxML = new System.Windows.Forms.CheckBox();
             this.textBoxUpload = new System.Windows.Forms.TextBox();
             this.checkBoxUpload = new System.Windows.Forms.CheckBox();
             this.groupBoxLog = new System.Windows.Forms.GroupBox();
@@ -46,10 +49,6 @@ namespace HousingCheck
             this.buttonUploadOnce = new System.Windows.Forms.Button();
             this.panel1 = new System.Windows.Forms.Panel();
             this.panel2 = new System.Windows.Forms.Panel();
-            this.label2 = new System.Windows.Forms.Label();
-            this.textBoxUploadToken = new System.Windows.Forms.TextBox();
-            this.label3 = new System.Windows.Forms.Label();
-            this.checkBoxUploadSnapshot = new System.Windows.Forms.CheckBox();
             this.groupBoxTable.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.housingCheckBindingSource)).BeginInit();
@@ -94,7 +93,6 @@ namespace HousingCheck
             this.groupBoxUpload.Controls.Add(this.textBoxUploadToken);
             this.groupBoxUpload.Controls.Add(this.label2);
             this.groupBoxUpload.Controls.Add(this.label1);
-            this.groupBoxUpload.Controls.Add(this.checkBoxML);
             this.groupBoxUpload.Controls.Add(this.textBoxUpload);
             this.groupBoxUpload.Controls.Add(this.checkBoxUpload);
             this.groupBoxUpload.Dock = System.Windows.Forms.DockStyle.Top;
@@ -107,6 +105,46 @@ namespace HousingCheck
             this.groupBoxUpload.TabStop = false;
             this.groupBoxUpload.Text = "上报设置";
             // 
+            // checkBoxUploadSnapshot
+            // 
+            this.checkBoxUploadSnapshot.AutoSize = true;
+            this.checkBoxUploadSnapshot.Checked = true;
+            this.checkBoxUploadSnapshot.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.checkBoxUploadSnapshot.Enabled = false;
+            this.checkBoxUploadSnapshot.Location = new System.Drawing.Point(144, 36);
+            this.checkBoxUploadSnapshot.Name = "checkBoxUploadSnapshot";
+            this.checkBoxUploadSnapshot.Size = new System.Drawing.Size(121, 24);
+            this.checkBoxUploadSnapshot.TabIndex = 7;
+            this.checkBoxUploadSnapshot.Text = "上报房区快照";
+            this.checkBoxUploadSnapshot.UseVisualStyleBackColor = true;
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(263, 143);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(219, 20);
+            this.label3.TabIndex = 6;
+            this.label3.Text = "如服务器未开启身份验证请留空";
+            // 
+            // textBoxUploadToken
+            // 
+            this.textBoxUploadToken.Enabled = false;
+            this.textBoxUploadToken.Location = new System.Drawing.Point(112, 110);
+            this.textBoxUploadToken.Name = "textBoxUploadToken";
+            this.textBoxUploadToken.ReadOnly = true;
+            this.textBoxUploadToken.Size = new System.Drawing.Size(370, 27);
+            this.textBoxUploadToken.TabIndex = 5;
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(34, 113);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(69, 20);
+            this.label2.TabIndex = 4;
+            this.label2.Text = "Token：";
+            // 
             // label1
             // 
             this.label1.AutoSize = true;
@@ -117,20 +155,6 @@ namespace HousingCheck
             this.label1.TabIndex = 3;
             this.label1.Text = "上报地址：";
             this.label1.Click += new System.EventHandler(this.label1_Click);
-            // 
-            // checkBoxML
-            // 
-            this.checkBoxML.AutoSize = true;
-            this.checkBoxML.Checked = true;
-            this.checkBoxML.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.checkBoxML.Enabled = false;
-            this.checkBoxML.Location = new System.Drawing.Point(172, 36);
-            this.checkBoxML.Margin = new System.Windows.Forms.Padding(5);
-            this.checkBoxML.Name = "checkBoxML";
-            this.checkBoxML.Size = new System.Drawing.Size(105, 24);
-            this.checkBoxML.TabIndex = 2;
-            this.checkBoxML.Text = "只上报M/L";
-            this.checkBoxML.UseVisualStyleBackColor = true;
             // 
             // textBoxUpload
             // 
@@ -247,46 +271,6 @@ namespace HousingCheck
             this.panel2.Size = new System.Drawing.Size(883, 1092);
             this.panel2.TabIndex = 5;
             // 
-            // label2
-            // 
-            this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(34, 113);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(69, 20);
-            this.label2.TabIndex = 4;
-            this.label2.Text = "Token：";
-            // 
-            // textBoxUploadToken
-            // 
-            this.textBoxUploadToken.Enabled = false;
-            this.textBoxUploadToken.Location = new System.Drawing.Point(112, 110);
-            this.textBoxUploadToken.Name = "textBoxUploadToken";
-            this.textBoxUploadToken.ReadOnly = true;
-            this.textBoxUploadToken.Size = new System.Drawing.Size(370, 27);
-            this.textBoxUploadToken.TabIndex = 5;
-            // 
-            // label3
-            // 
-            this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(263, 143);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(219, 20);
-            this.label3.TabIndex = 6;
-            this.label3.Text = "如服务器未开启身份验证请留空";
-            // 
-            // checkBoxUploadSnapshot
-            // 
-            this.checkBoxUploadSnapshot.AutoSize = true;
-            this.checkBoxUploadSnapshot.Checked = true;
-            this.checkBoxUploadSnapshot.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.checkBoxUploadSnapshot.Enabled = false;
-            this.checkBoxUploadSnapshot.Location = new System.Drawing.Point(313, 36);
-            this.checkBoxUploadSnapshot.Name = "checkBoxUploadSnapshot";
-            this.checkBoxUploadSnapshot.Size = new System.Drawing.Size(121, 24);
-            this.checkBoxUploadSnapshot.TabIndex = 7;
-            this.checkBoxUploadSnapshot.Text = "上报房区快照";
-            this.checkBoxUploadSnapshot.UseVisualStyleBackColor = true;
-            // 
             // PluginControl
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
@@ -321,7 +305,6 @@ namespace HousingCheck
         private System.Windows.Forms.GroupBox groupBoxLog;
         public System.Windows.Forms.TextBox textBoxLog;
         public System.Windows.Forms.TextBox textBoxUpload;
-        public System.Windows.Forms.CheckBox checkBoxML;
         private System.Windows.Forms.GroupBox groupBoxControl;
         public System.Windows.Forms.Button buttonCopyToClipboard;
         public System.Windows.Forms.Button buttonSaveToFile;
