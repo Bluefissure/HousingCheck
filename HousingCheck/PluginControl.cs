@@ -4,17 +4,69 @@ using System.Windows.Forms;
 using System.Xml;
 using System.IO;
 using Advanced_Combat_Tracker;
+using System.Collections.Generic;
 
 namespace HousingCheck
 {
     public partial class PluginControl : UserControl
     {
+        public ApiVersion UploadApiVersion
+        {
+            get {
+                return (selectApiVersion.SelectedItem == null) ? ApiVersion.V2 : (ApiVersion)selectApiVersion.SelectedValue;
+            }
+            set { }
+        }
+
+        public bool EnableUploadSnapshot {
+            get
+            {
+                return checkBoxUploadSnapshot.Checked;
+            }
+            set
+            {
+                checkBoxUploadSnapshot.Checked = value;
+            }
+        }
+
+        public string UploadUrl
+        {
+            get
+            {
+                return textBoxUpload.Text;
+            }
+            set
+            {
+                textBoxUpload.Text = value;
+            }
+        }
+
+        public string UploadToken
+        {
+            get
+            {
+                return textBoxUploadToken.Text;
+            }
+            set
+            {
+                textBoxUploadToken.Text = value;
+            }
+        }
 
         private static readonly string SettingsFile = Path.Combine(ActGlobals.oFormActMain.AppDataFolder.FullName, "Config\\HousingCheck.config.xml");
         public bool upload;
+        public Dictionary<string, ApiVersion> apiVersionList = new Dictionary<string, ApiVersion>();
         public PluginControl()
         {
             InitializeComponent();
+
+            //API版本选择
+            apiVersionList.Add("V1", ApiVersion.V1);
+            apiVersionList.Add("V2", ApiVersion.V2);
+            selectApiVersion.DataSource = new BindingSource(apiVersionList, null);
+            selectApiVersion.DisplayMember = "Key";
+            selectApiVersion.ValueMember = "Value";
+            selectApiVersion.SelectedIndex = 1;
         }
 
         private void checkBoxUpload_CheckedChanged(object sender, EventArgs e)
@@ -36,17 +88,25 @@ namespace HousingCheck
         {
             if (File.Exists(SettingsFile))
             {
-                XmlDocument xdo = new XmlDocument();
-                xdo.Load(SettingsFile);
-                XmlNode head = xdo.SelectSingleNode("Config");
-                textBoxUpload.Text = head?.SelectSingleNode("UploadURL")?.InnerText;
-                textBoxUploadToken.Text = head?.SelectSingleNode("UploadToken")?.InnerText;
-                checkBoxUpload.Checked = bool.Parse(head?.SelectSingleNode("AutoUpload")?.InnerText ?? "false");
-                //checkBoxML.Checked = bool.Parse(head?.SelectSingleNode("UploadMLOnly")?.InnerText ?? "true");
-                checkBoxUploadSnapshot.Checked = bool.Parse(head?.SelectSingleNode("UploadSnapshot")?.InnerText ?? "true");
+                try
+                {
+                    XmlDocument xdo = new XmlDocument();
+                    xdo.Load(SettingsFile);
+                    XmlNode head = xdo.SelectSingleNode("Config");
+                    textBoxUpload.Text = head?.SelectSingleNode("UploadURL")?.InnerText;
+                    selectApiVersion.SelectedIndex = int.Parse(head?.SelectSingleNode("UploadApiVersion")?.InnerText);
+                    textBoxUploadToken.Text = head?.SelectSingleNode("UploadToken")?.InnerText;
+                    checkBoxUpload.Checked = bool.Parse(head?.SelectSingleNode("AutoUpload")?.InnerText ?? "false");
+                    //checkBoxML.Checked = bool.Parse(head?.SelectSingleNode("UploadMLOnly")?.InnerText ?? "true");
+                    checkBoxUploadSnapshot.Checked = bool.Parse(head?.SelectSingleNode("UploadSnapshot")?.InnerText ?? "true");
+                }
+                catch(Exception ex)
+                {
+                    File.Delete(SettingsFile);
+                }
             }
-
         }
+
         public void SaveSettings()
         {
             FileStream fs = new FileStream(SettingsFile, FileMode.Create, FileAccess.Write, FileShare.ReadWrite);
@@ -54,6 +114,7 @@ namespace HousingCheck
             xWriter.WriteStartDocument(true);
             xWriter.WriteStartElement("Config");    // <Config>
             xWriter.WriteElementString("UploadURL", textBoxUpload.Text);
+            xWriter.WriteElementString("UploadApiVersion", selectApiVersion.SelectedIndex.ToString());
             xWriter.WriteElementString("UploadToken", textBoxUploadToken.Text);
             xWriter.WriteElementString("AutoUpload", checkBoxUpload.Checked.ToString());
             //xWriter.WriteElementString("UploadMLOnly", checkBoxML.Checked.ToString());

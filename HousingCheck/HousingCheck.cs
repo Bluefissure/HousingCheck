@@ -26,6 +26,8 @@ public static class Extensions
 
 namespace HousingCheck
 {
+    public enum ApiVersion { V1, V2 }
+
     public class HousingCheck : IActPluginV1
     {
         public ObservableCollection<HousingOnSaleItem> HousingList = new ObservableCollection<HousingOnSaleItem>();
@@ -319,6 +321,7 @@ namespace HousingCheck
             bool autoUpload;
             bool manualUpload;
             bool uploadSnapshot;
+            ApiVersion apiVersion;
             while (true)
             {
                 if (AutoSaveThread.CancellationPending)
@@ -331,9 +334,24 @@ namespace HousingCheck
                 snapshotCount = AutoUploadSnapshot.Count;
                 autoUpload = control.upload;
                 manualUpload = ManualUpload;
-                uploadSnapshot = control.checkBoxUploadSnapshot.Checked;
+                uploadSnapshot = control.EnableUploadSnapshot;
+                apiVersion = control.UploadApiVersion;
                 Monitor.Exit(this);
-                if (actionTime <= new DateTimeOffset(DateTime.Now).ToUnixTimeSeconds())
+                if (manualUpload)
+                {
+                    UploadOnSaleList(apiVersion);
+                    Monitor.Enter(this);
+                    HousingListUpdated = false;
+                    Monitor.Exit(this);
+                    if (apiVersion == ApiVersion.V2 && uploadSnapshot && snapshotCount > 0)
+                    {
+                        UploadSnapshot();
+                    }
+                    Monitor.Enter(this);
+                    ManualUpload = false;
+                    Monitor.Exit(this);
+                }
+                else if (actionTime <= new DateTimeOffset(DateTime.Now).ToUnixTimeSeconds())
                 {
                     if (dataUpdated || snapshotCount > 0) //如果有更新
                     {
@@ -347,51 +365,41 @@ namespace HousingCheck
                             if (autoUpload)
                             {
                                 //自动上报
-                                UploadOnSaleList();
+                                UploadOnSaleList(apiVersion);
                             }
                             Monitor.Enter(this);
                             HousingListUpdated = false;
                             Monitor.Exit(this);
                         }
 
-                        if (autoUpload && uploadSnapshot && snapshotCount > 0)
+                        if (autoUpload && apiVersion == ApiVersion.V2 && 
+                            uploadSnapshot && snapshotCount > 0)
                         {
                             //上传快照
                             UploadSnapshot();
                         }
                     }
                 }
-                else if (manualUpload)
-                {
-                    UploadOnSaleList();
-                    if (uploadSnapshot && snapshotCount > 0)
-                    {
-                        UploadSnapshot();
-                    }
-                    Monitor.Enter(this);
-                    ManualUpload = false;
-                    Monitor.Exit(this);
-                }
                 Thread.Sleep(500);
             }
         }
 
-        public bool UploadData(string type, string json)
+        public bool UploadData(string type, string postContent, string mime = "application/json")
         {
             var wb = new WebClient();
             Monitor.Enter(this);
-            var token = control.textBoxUploadToken.Text.Trim();
+            var token = control.UploadToken.Trim();
             if (token != "")
             {
                 wb.Headers[HttpRequestHeader.Authorization] = "Token " + token;
             }
-            wb.Headers[HttpRequestHeader.ContentType] = "application/json";
-            var url = control.textBoxUpload.Text.TrimEnd('/') + "/" + type;
+            wb.Headers[HttpRequestHeader.ContentType] = mime;
+            var url = control.UploadUrl.TrimEnd('/') + "/" + type;
             Monitor.Exit(this);
             try
             {
                 var response = wb.UploadData(url, "POST",
-                    Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(json))
+                    Encoding.UTF8.GetBytes(postContent)
                 );
                 string res = Encoding.UTF8.GetString(response);
                 if(res.Length > 0)
@@ -434,13 +442,28 @@ namespace HousingCheck
             return false;
         }
 
-        private void UploadOnSaleList()
+        private void UploadOnSaleList(ApiVersion apiVersion = ApiVersion.V2)
         {
             Monitor.Enter(this);
-            string json = JsonConvert.SerializeObject(HousingList);
+            string postContent = "";
+            string mime = "application/json";
+            switch (apiVersion)
+            {
+                case ApiVersion.V2:
+                    postContent = JsonConvert.SerializeObject(HousingList);
+                    break;
+                case ApiVersion.V1:
+                    postContent = "text=" + WebUtility.UrlEncode(ListToString());
+                    mime = "application/x-www-form-urlencoded";
+                    break;
+            }
+            if(postContent.Length == 0)
+            {
+                Log("Error", "上报数据为空");
+            }
             Log("Info", "正在上传空房列表");
             Monitor.Exit(this);
-            bool res = UploadData("info", json);
+            bool res = UploadData("info", postContent, mime);
 
             if (res)
             {
