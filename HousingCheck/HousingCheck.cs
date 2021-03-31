@@ -172,7 +172,7 @@ namespace HousingCheck
                 {
                     HousingOnSaleItem onSaleItem = new HousingOnSaleItem(house);
                     Log("Info", string.Format("{0} 第{1}区 {2}号 {3}房在售 当前价格: {4}",
-                        onSaleItem.AreaStr, onSaleItem.Slot, onSaleItem.Id,
+                        onSaleItem.AreaStr, onSaleItem.DisplaySlot, onSaleItem.DisplayId,
                         onSaleItem.SizeStr, onSaleItem.Price));
 
                     if (onSaleItem.Size == HouseSize.M || onSaleItem.Size == HouseSize.L)
@@ -281,7 +281,7 @@ namespace HousingCheck
                 if (!line.CurrentStatus) 
                     continue;
 
-                stringBuilder.Append($"{line.Area} 第{line.Slot}区 {line.Id}号{line.Size}房在售，当前价格:{line.Price} {Environment.NewLine}");
+                stringBuilder.Append($"{line.AreaStr} 第{line.DisplaySlot}区 {line.DisplayId}号{line.SizeStr}房在售，当前价格:{line.Price} {Environment.NewLine}");
 
                 if (line.Area == HouseArea.海雾村 && area.IndexOf("海雾村") != -1)
                 {
@@ -461,6 +461,7 @@ namespace HousingCheck
             {
                 Log("Error", "上报数据为空");
             }
+            Log("Debug", postContent);
             Log("Info", "正在上传空房列表");
             Monitor.Exit(this);
             bool res = UploadData("info", postContent, mime);
