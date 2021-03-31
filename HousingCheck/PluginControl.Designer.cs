@@ -222,7 +222,7 @@ namespace HousingCheck
             // 
             // buttonCopyToClipboard
             // 
-            this.buttonCopyToClipboard.Location = new System.Drawing.Point(330, 34);
+            this.buttonCopyToClipboard.Location = new System.Drawing.Point(335, 34);
             this.buttonCopyToClipboard.Margin = new System.Windows.Forms.Padding(5);
             this.buttonCopyToClipboard.Name = "buttonCopyToClipboard";
             this.buttonCopyToClipboard.Size = new System.Drawing.Size(147, 39);
@@ -232,7 +232,7 @@ namespace HousingCheck
             // 
             // buttonSaveToFile
             // 
-            this.buttonSaveToFile.Location = new System.Drawing.Point(173, 34);
+            this.buttonSaveToFile.Location = new System.Drawing.Point(175, 34);
             this.buttonSaveToFile.Margin = new System.Windows.Forms.Padding(5);
             this.buttonSaveToFile.Name = "buttonSaveToFile";
             this.buttonSaveToFile.Size = new System.Drawing.Size(147, 39);
@@ -242,7 +242,7 @@ namespace HousingCheck
             // 
             // buttonUploadOnce
             // 
-            this.buttonUploadOnce.Location = new System.Drawing.Point(10, 34);
+            this.buttonUploadOnce.Location = new System.Drawing.Point(15, 34);
             this.buttonUploadOnce.Margin = new System.Windows.Forms.Padding(5);
             this.buttonUploadOnce.Name = "buttonUploadOnce";
             this.buttonUploadOnce.Size = new System.Drawing.Size(147, 39);
