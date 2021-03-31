@@ -70,6 +70,7 @@ namespace HousingCheck
                 subs.GetType().GetEvent("NetworkReceived").RemoveEventHandler(subs, networkReceivedDelegate);
                 AutoSaveThread.CancelAsync();
                 control.SaveSettings();
+                SaveHousingList();
                 statusLabel.Text = "Exit :|";
             }
             else
@@ -86,6 +87,7 @@ namespace HousingCheck
             pluginScreenSpace.Text = "房屋信息记录";
             bindingSource1 = new BindingSource { DataSource = HousingList };
             control.dataGridView1.DataSource = bindingSource1;
+            control.dataGridView1.UserDeletedRow += OnTableUpdated;
             control.Dock = DockStyle.Fill;
             pluginScreenSpace.Controls.Add(control);
 
@@ -107,6 +109,8 @@ namespace HousingCheck
             control.buttonCopyToClipboard.Click += ButtonCopyToClipboard_Click;
             control.buttonSaveToFile.Click += ButtonSaveToFile_Click;
             PrepareDir();
+            //恢复上次列表
+            LoadHousingList();
         }
 
         int GetServerId()
@@ -128,15 +132,9 @@ namespace HousingCheck
 
         string HousingListToJson()
         {
-            var saveList = new List<HousingOnSaleItem>();
-            foreach(var house in HousingList)
-            {
-                if (house.CurrentStatus)
-                {
-                    saveList.Add(house);
-                }
-            }
-            return JsonConvert.SerializeObject(saveList.ToArray());
+            return JsonConvert.SerializeObject(
+                    HousingList.Where(x => x.CurrentStatus).ToArray()
+                );
         }
 
         void NetworkReceived(string connection, long epoch, byte[] message)
@@ -236,6 +234,29 @@ namespace HousingCheck
             Log("Info", $"房屋列表已保存到{savePath}");
         }
 
+        private void LoadHousingList()
+        {
+            string savePath = Path.Combine(new string[] { Environment.CurrentDirectory, "AppData", "HousingCheck", "list.json" });
+            if (!File.Exists(savePath)) return;
+            StreamReader reader = new StreamReader(savePath, Encoding.UTF8);
+            string jsonStr = reader.ReadToEnd();
+            reader.Close();
+            try
+            {
+                var list = JsonConvert.DeserializeObject<HousingOnSaleItem[]>(jsonStr);
+                foreach(var item in list)
+                {
+                    bindingSource1.Add(item);
+                }
+                Log("Info", "已恢复上次保存的房屋列表");
+            }
+            catch(Exception ex)
+            {
+                Log("Error", "恢复上次保存的房屋列表失败：" + ex.Message);
+            }
+            reader.Close();
+        }
+
         private void ButtonSaveToFile_Click(object sender, EventArgs e)
         {
             PrepareDir();
@@ -285,6 +306,11 @@ namespace HousingCheck
             return stringBuilder.ToString();
         }
 
+        private void OnTableUpdated(object sender, DataGridViewRowEventArgs e)
+        {
+            HousingListUpdated = true;
+        }
+
         private void AutoSaveWorker(object sender, DoWorkEventArgs e)
         {
             long actionTime;
@@ -323,6 +349,9 @@ namespace HousingCheck
                                 //自动上报
                                 UploadOnSaleList();
                             }
+                            Monitor.Enter(this);
+                            HousingListUpdated = false;
+                            Monitor.Exit(this);
                         }
 
                         if (autoUpload && uploadSnapshot && snapshotCount > 0)
@@ -410,7 +439,6 @@ namespace HousingCheck
             Monitor.Enter(this);
             string json = JsonConvert.SerializeObject(HousingList);
             Log("Info", "正在上传空房列表");
-            HousingListUpdated = false;
             Monitor.Exit(this);
             bool res = UploadData("info", json);
 

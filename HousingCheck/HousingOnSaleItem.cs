@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Newtonsoft.Json;
+using System;
 using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace HousingCheck
 {
@@ -33,6 +30,10 @@ namespace HousingCheck
             CurrentStatus = true;
         }
 
+        //用于从json恢复数据
+        public HousingOnSaleItem() { }
+
+        [JsonIgnore]
         [DisplayName("住宅区")]
         public string AreaStr { 
             get {
@@ -40,6 +41,8 @@ namespace HousingCheck
             }
             set { }
         }
+
+        [JsonIgnore]
         [DisplayName("区")]
         public int DisplaySlot
         {
@@ -49,6 +52,8 @@ namespace HousingCheck
             }
             set { }
         }
+
+        [JsonIgnore]
         [DisplayName("号")]
         public int DisplayId
         {
@@ -58,6 +63,8 @@ namespace HousingCheck
             }
             set { }
         }
+
+        [JsonIgnore]
         [DisplayName("大小")]
         public string SizeStr { 
             get {
@@ -65,12 +72,17 @@ namespace HousingCheck
             }
             set { }
         }
+
         [DisplayName("价格")]
         public int Price { get; set; }
+
         [DisplayName("首次记录时间")]
         public DateTime AddTime { get; set; }
+
         [DisplayName("最后记录时间")]
         public DateTime ExistenceTime { get; set; }
+
+        [JsonIgnore]
         [DisplayName("当前状态")]
         public string CurrentStatusStr { 
             get {
