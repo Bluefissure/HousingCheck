@@ -461,7 +461,7 @@ namespace HousingCheck
             {
                 Log("Error", "上报数据为空");
             }
-            Log("Debug", postContent);
+            //Log("Debug", postContent);
             Log("Info", "正在上传空房列表");
             Monitor.Exit(this);
             bool res = UploadData("info", postContent, mime);
