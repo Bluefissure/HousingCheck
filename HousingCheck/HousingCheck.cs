@@ -424,7 +424,18 @@ namespace HousingCheck
                 wb.Headers[HttpRequestHeader.Authorization] = "Token " + token;
             }
             wb.Headers[HttpRequestHeader.ContentType] = mime;
-            var url = control.UploadUrl.TrimEnd('/') + "/" + type;
+
+            string url;
+            switch (control.UploadApiVersion)
+            {
+                case ApiVersion.V1:
+                    url = control.UploadUrl;
+                    break;
+                case ApiVersion.V2:
+                default:
+                    url = control.UploadUrl.TrimEnd('/') + "/" + type;
+                    break;
+            }
             Monitor.Exit(this);
             try
             {
