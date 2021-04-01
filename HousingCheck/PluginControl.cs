@@ -100,7 +100,7 @@ namespace HousingCheck
                     //checkBoxML.Checked = bool.Parse(head?.SelectSingleNode("UploadMLOnly")?.InnerText ?? "true");
                     checkBoxUploadSnapshot.Checked = bool.Parse(head?.SelectSingleNode("UploadSnapshot")?.InnerText ?? "true");
                 }
-                catch(Exception ex)
+                catch (Exception)
                 {
                     File.Delete(SettingsFile);
                 }

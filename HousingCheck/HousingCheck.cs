@@ -132,6 +132,11 @@ namespace HousingCheck
             ActGlobals.oFormActMain.ParseRawLogLine(false, DateTime.Now, $"{text}");    //插入ACT日志
         }
 
+        void Log(string type, Exception ex, string msg = "")
+        {
+            Log(type, msg + ex.ToString());
+        }
+
         string HousingListToJson()
         {
             return JsonConvert.SerializeObject(
@@ -166,6 +171,30 @@ namespace HousingCheck
                 }
 
                 HousingItem[] onSaleList = snapshot.GetOnSale();
+
+                Monitor.Enter(this);
+                foreach (var item in HousingList)
+                {
+                    if (item.Area == snapshot.Area && item.Slot == snapshot.Slot)
+                    {
+                        if(onSaleList.Where(x => x.Slot == item.Slot && x.IsEmpty)
+                            .ToArray().Length == 0)
+                        {
+                            //空房已消失
+                            item.CurrentStatus = false;
+                            HousingListUpdated = true;
+                            try
+                            {
+                                bindingSource1.ResetItem(HousingList.IndexOf(item));
+                            }
+                            catch(Exception ex)
+                            {
+                                Log("Error", ex, "刷新列表出错：");
+                            }
+                        }
+                    }
+                }
+
                 int listIndex;
                 //更新空房列表
                 foreach(HousingItem house in onSaleList)
@@ -192,14 +221,15 @@ namespace HousingCheck
                     HousingListUpdated = true;
                 }
                 LastOperateTime = new DateTimeOffset(DateTime.Now).ToUnixTimeSeconds(); //更新上次操作的时间
-                bindingSource1.ResetBindings(false); //刷新列表
+
                 Log("Info", string.Format("{0} 第{1}区查询完成",
                     HousingItem.GetHouseAreaStr(snapshot.Area),
                     snapshot.Slot + 1));     //输出翻页日志
+                Monitor.Exit(this);
             }
             catch (Exception ex)
             {
-                Log("Error", ex.Message);
+                Log("Error", ex, "查询房屋列表出错：");
                 return;
             }
         }
@@ -254,7 +284,7 @@ namespace HousingCheck
             }
             catch(Exception ex)
             {
-                Log("Error", "恢复上次保存的房屋列表失败：" + ex.Message);
+                Log("Error", ex, "恢复上次保存的房屋列表失败：");
             }
             reader.Close();
         }
@@ -436,7 +466,7 @@ namespace HousingCheck
             catch(Exception ex)
             {
                 Monitor.Enter(this);
-                Log("Error", "上传出错：" + ex.Message);
+                Log("Error", ex, "上传出错：");
                 Monitor.Exit(this);
             }
             return false;
@@ -506,7 +536,7 @@ namespace HousingCheck
             }
             catch(Exception ex)
             {
-                Log("Error", ex.Message + Environment.NewLine + ex.StackTrace);
+                Log("Error", ex, "房区快照上报出错：");
             }
             //Log("Info", $"上报消息给 {post_url}");
         }
