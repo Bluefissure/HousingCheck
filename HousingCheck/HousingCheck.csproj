@@ -88,6 +88,7 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>xcopy C:\Users\Stormkeeper\source\repos\HousingCheck\HousingCheck\bin\Release F:\Test\FFXIV\ACT\Plugins\HousingCheck  /y</PostBuildEvent>
+    <PostBuildEvent>
+    </PostBuildEvent>
   </PropertyGroup>
 </Project>
