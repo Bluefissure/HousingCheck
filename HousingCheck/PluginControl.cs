@@ -16,11 +16,13 @@ namespace HousingCheck
     public partial class PluginControl : UserControl
     {
 
-        private static readonly string SettingsFile = Path.Combine(ActGlobals.oFormActMain.AppDataFolder.FullName, "Config\\HousingCheck.config.xml");
+        public static readonly string SettingsFile = Path.Combine(ActGlobals.oFormActMain.AppDataFolder.FullName, "Config\\HousingCheck.config.xml");
+        public readonly string ItemsFile = Path.Combine(ActGlobals.oFormActMain.AppDataFolder.FullName, "Config\\HousingCheck.item.json");
         public bool upload;
         public PluginControl()
         {
             InitializeComponent();
+            //numericUpDownTimeout.Location = new Point(label1.Location.X + label1.Width, numericUpDownTimeout.Location.Y);
         }
 
         private void checkBoxUpload_CheckedChanged(object sender, EventArgs e)
@@ -30,6 +32,8 @@ namespace HousingCheck
             this.textBoxUpload.ReadOnly = !upload;
             this.textBoxUpload.Enabled = upload;
         }
+
+        
 
         public void LoadSettings()
         {
@@ -41,6 +45,8 @@ namespace HousingCheck
                 textBoxUpload.Text = head?.SelectSingleNode("OtterURL")?.InnerText;
                 checkBoxUpload.Checked = bool.Parse(head?.SelectSingleNode("AutoUpload")?.InnerText ?? "false");
                 checkBoxML.Checked = bool.Parse(head?.SelectSingleNode("ML")?.InnerText ?? "true");
+                numericUpDownTimeout.Value = decimal.Parse(head?.SelectSingleNode("Timeout")?.InnerText ?? "45");
+                checkBoxAutoSaveAndLoad.Checked = bool.Parse(head?.SelectSingleNode("AutoSaveAndLoad")?.InnerText ?? "false");
             }
 
         }
@@ -53,6 +59,8 @@ namespace HousingCheck
             xWriter.WriteElementString("OtterURL", textBoxUpload.Text);
             xWriter.WriteElementString("AutoUpload", checkBoxUpload.Checked.ToString());
             xWriter.WriteElementString("ML", checkBoxML.Checked.ToString());
+            xWriter.WriteElementString("Timeout", numericUpDownTimeout.Value.ToString());
+            xWriter.WriteElementString("AutoSaveAndLoad", checkBoxAutoSaveAndLoad.Checked.ToString());
             xWriter.WriteEndElement();              // </Config>
             xWriter.WriteEndDocument();             // Tie up loose ends (shouldn't be any)
             xWriter.Flush();                        // Flush the file buffer to disk

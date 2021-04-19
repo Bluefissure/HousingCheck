@@ -50,8 +50,7 @@ namespace HousingCheck
             return (obj.Area == Area
                         && obj.Slot == Slot
                         && obj.Id == Id
-                        && obj.Size == Size
-                        && obj.Price == Price);
+                        && obj.Size == Size);
         }
 
     }
