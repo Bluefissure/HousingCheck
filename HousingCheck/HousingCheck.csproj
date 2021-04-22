@@ -36,12 +36,14 @@
   <ItemGroup>
     <Reference Include="Advanced Combat Tracker">
       <HintPath>..\..\HouseCheck\HouseCheck\Advanced Combat Tracker.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="FFXIV_ACT_Plugin">
       <HintPath>..\..\HouseCheck\HouseCheck\FFXIV_ACT_Plugin.dll</HintPath>
     </Reference>
     <Reference Include="FFXIV_ACT_Plugin.Common">
       <HintPath>..\..\HouseCheck\HouseCheck\FFXIV_ACT_Plugin.Common.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="FFXIV_ACT_Plugin.Config">
       <HintPath>..\..\..\..\ACTv3\Plugins\SDK_2.0.5.10\FFXIV_ACT_Plugin.Config.dll</HintPath>
