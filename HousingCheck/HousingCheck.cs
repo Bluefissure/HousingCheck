@@ -144,10 +144,8 @@ namespace HousingCheck
                 );
         }
 
-        void NetworkReceived(string connection, long epoch, byte[] message)
+        void NetworkReceivedSync(byte[] message)
         {
-            var opcode = BitConverter.ToUInt16(message, 18);
-            if (opcode != 0x164 && message.Length != 2440) return;
             HousingSlotSnapshot snapshot;
             try
             {
@@ -161,10 +159,10 @@ namespace HousingCheck
                 //存入存储
                 SnapshotStorage.Insert(snapshot);
                 AutoUploadSnapshot[new Tuple<HouseArea, int>(snapshot.Area, snapshot.Slot)] = snapshot;
-                
-                foreach(HousingOnSaleItem item in HousingList)
+
+                foreach (HousingOnSaleItem item in HousingList)
                 {
-                    if(item.Area == snapshot.Area && item.Slot == snapshot.Slot)
+                    if (item.Area == snapshot.Area && item.Slot == snapshot.Slot)
                     {
                         item.CurrentStatus = false;
                     }
@@ -172,12 +170,11 @@ namespace HousingCheck
 
                 HousingItem[] onSaleList = snapshot.GetOnSale();
 
-                Monitor.Enter(this);
                 foreach (var item in HousingList)
                 {
                     if (item.Area == snapshot.Area && item.Slot == snapshot.Slot)
                     {
-                        if(onSaleList.Where(x => x.Slot == item.Slot && x.IsEmpty)
+                        if (onSaleList.Where(x => x.Slot == item.Slot && x.IsEmpty)
                             .ToArray().Length == 0)
                         {
                             //空房已消失
@@ -187,7 +184,7 @@ namespace HousingCheck
                             {
                                 bindingSource1.ResetItem(HousingList.IndexOf(item));
                             }
-                            catch(Exception ex)
+                            catch (Exception ex)
                             {
                                 Log("Error", ex, "刷新列表出错：");
                             }
@@ -197,7 +194,7 @@ namespace HousingCheck
 
                 int listIndex;
                 //更新空房列表
-                foreach(HousingItem house in onSaleList)
+                foreach (HousingItem house in onSaleList)
                 {
                     HousingOnSaleItem onSaleItem = new HousingOnSaleItem(house);
                     Log("Info", string.Format("{0} 第{1}区 {2}号 {3}房在售 当前价格: {4}",
@@ -225,13 +222,20 @@ namespace HousingCheck
                 Log("Info", string.Format("{0} 第{1}区查询完成",
                     HousingItem.GetHouseAreaStr(snapshot.Area),
                     snapshot.Slot + 1));     //输出翻页日志
-                Monitor.Exit(this);
             }
             catch (Exception ex)
             {
                 Log("Error", ex, "查询房屋列表出错：");
                 return;
             }
+        }
+
+        void NetworkReceived(string connection, long epoch, byte[] message)
+        {
+            var opcode = BitConverter.ToUInt16(message, 18);
+            if (opcode != 0x164 && message.Length != 2440) return;
+
+            control.Invoke(new Action<byte[]>(NetworkReceivedSync), message);
         }
 
         private void ButtonUploadOnce_Click(object sender, EventArgs e)
