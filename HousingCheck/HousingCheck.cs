@@ -131,7 +131,7 @@ namespace HousingCheck
         void NetworkReceived(string connection, long epoch, byte[] message)
         {
             var opcode = BitConverter.ToUInt16(message, 18);
-            if (opcode != 733 /*&& message.Length != 2440*/) return;
+            if (opcode != 284 /*&& message.Length != 2440*/) return;
             //Log("Debug", $"OPCODE:{opcode}");
             var data_list = message.SubArray(32, message.Length - 32);
             var data_header = data_list.SubArray(0, 8);
