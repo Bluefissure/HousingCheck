@@ -128,10 +128,8 @@ namespace HousingCheck
             ActGlobals.oFormActMain.ParseRawLogLine(false, DateTime.Now, $"{text}");    //插入ACT日志
         }
 
-        void NetworkReceived(string connection, long epoch, byte[] message)
+        void NetworkReceivedSync(byte[] message)
         {
-            var opcode = BitConverter.ToUInt16(message, 18);
-            if (opcode != 284 /*&& message.Length != 2440*/) return;
             //Log("Debug", $"OPCODE:{opcode}");
             var data_list = message.SubArray(32, message.Length - 32);
             var data_header = data_list.SubArray(0, 8);
@@ -190,6 +188,14 @@ namespace HousingCheck
             }
             Log("Info", $"查询第{slot + 1}区");     //输出翻页日志
         }
+
+        void NetworkReceived(string connection, long epoch, byte[] message)
+        {
+            var opcode = BitConverter.ToUInt16(message, 18);
+            if (opcode != 284 && message.Length != 2440) return;
+            control.Invoke(new Action<byte[]>(NetworkReceivedSync), message);
+        }
+
 
         private void ButtonUploadOnce_Click(object sender, EventArgs e)
         {

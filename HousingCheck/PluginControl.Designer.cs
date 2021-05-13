@@ -69,9 +69,9 @@ namespace HousingCheck
             // groupBoxTable
             // 
             this.groupBoxTable.Controls.Add(this.dataGridView1);
-            this.groupBoxTable.Location = new System.Drawing.Point(13, 18);
+            this.groupBoxTable.Location = new System.Drawing.Point(13, 20);
             this.groupBoxTable.Name = "groupBoxTable";
-            this.groupBoxTable.Size = new System.Drawing.Size(564, 602);
+            this.groupBoxTable.Size = new System.Drawing.Size(564, 652);
             this.groupBoxTable.TabIndex = 0;
             this.groupBoxTable.TabStop = false;
             this.groupBoxTable.Text = "在售列表";
@@ -92,10 +92,10 @@ namespace HousingCheck
             this.priceDataGridViewTextBoxColumn,
             this.addTimeDataGridViewTextBoxColumn,
             this.existenceTimeDataGridViewTextBoxColumn});
-            this.dataGridView1.Location = new System.Drawing.Point(7, 18);
+            this.dataGridView1.Location = new System.Drawing.Point(7, 20);
             this.dataGridView1.Name = "dataGridView1";
             this.dataGridView1.ReadOnly = true;
-            this.dataGridView1.Size = new System.Drawing.Size(551, 578);
+            this.dataGridView1.Size = new System.Drawing.Size(551, 626);
             this.dataGridView1.TabIndex = 0;
             // 
             // areaDataGridViewTextBoxColumn
@@ -165,9 +165,9 @@ namespace HousingCheck
             this.groupBoxUpload.Controls.Add(this.checkBoxML);
             this.groupBoxUpload.Controls.Add(this.textBoxUpload);
             this.groupBoxUpload.Controls.Add(this.checkBoxUpload);
-            this.groupBoxUpload.Location = new System.Drawing.Point(583, 18);
+            this.groupBoxUpload.Location = new System.Drawing.Point(583, 20);
             this.groupBoxUpload.Name = "groupBoxUpload";
-            this.groupBoxUpload.Size = new System.Drawing.Size(321, 126);
+            this.groupBoxUpload.Size = new System.Drawing.Size(321, 137);
             this.groupBoxUpload.TabIndex = 1;
             this.groupBoxUpload.TabStop = false;
             this.groupBoxUpload.Text = "上报设置";
@@ -177,9 +177,9 @@ namespace HousingCheck
             this.checkBoxML.AutoSize = true;
             this.checkBoxML.Checked = true;
             this.checkBoxML.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.checkBoxML.Location = new System.Drawing.Point(114, 18);
+            this.checkBoxML.Location = new System.Drawing.Point(114, 20);
             this.checkBoxML.Name = "checkBoxML";
-            this.checkBoxML.Size = new System.Drawing.Size(78, 16);
+            this.checkBoxML.Size = new System.Drawing.Size(82, 17);
             this.checkBoxML.TabIndex = 2;
             this.checkBoxML.Text = "只上报M/L";
             this.checkBoxML.UseVisualStyleBackColor = true;
@@ -187,19 +187,19 @@ namespace HousingCheck
             // textBoxUpload
             // 
             this.textBoxUpload.Enabled = false;
-            this.textBoxUpload.Location = new System.Drawing.Point(7, 41);
+            this.textBoxUpload.Location = new System.Drawing.Point(7, 44);
             this.textBoxUpload.Multiline = true;
             this.textBoxUpload.Name = "textBoxUpload";
             this.textBoxUpload.ReadOnly = true;
-            this.textBoxUpload.Size = new System.Drawing.Size(308, 79);
+            this.textBoxUpload.Size = new System.Drawing.Size(308, 85);
             this.textBoxUpload.TabIndex = 1;
             // 
             // checkBoxUpload
             // 
             this.checkBoxUpload.AutoSize = true;
-            this.checkBoxUpload.Location = new System.Drawing.Point(7, 18);
+            this.checkBoxUpload.Location = new System.Drawing.Point(7, 20);
             this.checkBoxUpload.Name = "checkBoxUpload";
-            this.checkBoxUpload.Size = new System.Drawing.Size(96, 16);
+            this.checkBoxUpload.Size = new System.Drawing.Size(98, 17);
             this.checkBoxUpload.TabIndex = 0;
             this.checkBoxUpload.Text = "开启自动上报";
             this.checkBoxUpload.UseVisualStyleBackColor = true;
@@ -208,21 +208,21 @@ namespace HousingCheck
             // groupBoxLog
             // 
             this.groupBoxLog.Controls.Add(this.textBoxLog);
-            this.groupBoxLog.Location = new System.Drawing.Point(583, 269);
+            this.groupBoxLog.Location = new System.Drawing.Point(583, 291);
             this.groupBoxLog.Name = "groupBoxLog";
-            this.groupBoxLog.Size = new System.Drawing.Size(321, 351);
+            this.groupBoxLog.Size = new System.Drawing.Size(321, 380);
             this.groupBoxLog.TabIndex = 2;
             this.groupBoxLog.TabStop = false;
             this.groupBoxLog.Text = "日志";
             // 
             // textBoxLog
             // 
-            this.textBoxLog.Location = new System.Drawing.Point(7, 18);
+            this.textBoxLog.Location = new System.Drawing.Point(7, 20);
             this.textBoxLog.Multiline = true;
             this.textBoxLog.Name = "textBoxLog";
             this.textBoxLog.ReadOnly = true;
             this.textBoxLog.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.textBoxLog.Size = new System.Drawing.Size(307, 325);
+            this.textBoxLog.Size = new System.Drawing.Size(307, 352);
             this.textBoxLog.TabIndex = 0;
             // 
             // groupBoxControl
@@ -235,27 +235,27 @@ namespace HousingCheck
             this.groupBoxControl.Controls.Add(this.buttonCopyToClipboard);
             this.groupBoxControl.Controls.Add(this.buttonSaveToFile);
             this.groupBoxControl.Controls.Add(this.buttonUploadOnce);
-            this.groupBoxControl.Location = new System.Drawing.Point(583, 150);
+            this.groupBoxControl.Location = new System.Drawing.Point(583, 163);
             this.groupBoxControl.Name = "groupBoxControl";
-            this.groupBoxControl.Size = new System.Drawing.Size(320, 113);
+            this.groupBoxControl.Size = new System.Drawing.Size(320, 122);
             this.groupBoxControl.TabIndex = 3;
             this.groupBoxControl.TabStop = false;
             this.groupBoxControl.Text = "列表操作";
             // 
             // buttonJsonLoad
             // 
-            this.buttonJsonLoad.Location = new System.Drawing.Point(111, 49);
+            this.buttonJsonLoad.Location = new System.Drawing.Point(111, 53);
             this.buttonJsonLoad.Name = "buttonJsonLoad";
-            this.buttonJsonLoad.Size = new System.Drawing.Size(98, 23);
+            this.buttonJsonLoad.Size = new System.Drawing.Size(98, 25);
             this.buttonJsonLoad.TabIndex = 6;
             this.buttonJsonLoad.Text = "读取列表记录";
             this.buttonJsonLoad.UseVisualStyleBackColor = true;
             // 
             // buttonJsonSave
             // 
-            this.buttonJsonSave.Location = new System.Drawing.Point(6, 49);
+            this.buttonJsonSave.Location = new System.Drawing.Point(6, 53);
             this.buttonJsonSave.Name = "buttonJsonSave";
-            this.buttonJsonSave.Size = new System.Drawing.Size(98, 23);
+            this.buttonJsonSave.Size = new System.Drawing.Size(98, 25);
             this.buttonJsonSave.TabIndex = 6;
             this.buttonJsonSave.Text = "保存列表记录";
             this.buttonJsonSave.UseVisualStyleBackColor = true;
@@ -265,23 +265,23 @@ namespace HousingCheck
             this.checkBoxAutoSaveAndLoad.AutoSize = true;
             this.checkBoxAutoSaveAndLoad.Checked = true;
             this.checkBoxAutoSaveAndLoad.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.checkBoxAutoSaveAndLoad.Location = new System.Drawing.Point(216, 53);
+            this.checkBoxAutoSaveAndLoad.Location = new System.Drawing.Point(216, 57);
             this.checkBoxAutoSaveAndLoad.Name = "checkBoxAutoSaveAndLoad";
-            this.checkBoxAutoSaveAndLoad.Size = new System.Drawing.Size(96, 16);
+            this.checkBoxAutoSaveAndLoad.Size = new System.Drawing.Size(98, 17);
             this.checkBoxAutoSaveAndLoad.TabIndex = 0;
             this.checkBoxAutoSaveAndLoad.Text = "自动存取记录";
             this.checkBoxAutoSaveAndLoad.UseVisualStyleBackColor = true;
             // 
             // numericUpDownTimeout
             // 
-            this.numericUpDownTimeout.Location = new System.Drawing.Point(217, 84);
+            this.numericUpDownTimeout.Location = new System.Drawing.Point(217, 91);
             this.numericUpDownTimeout.Maximum = new decimal(new int[] {
             1440,
             0,
             0,
             0});
             this.numericUpDownTimeout.Name = "numericUpDownTimeout";
-            this.numericUpDownTimeout.Size = new System.Drawing.Size(48, 21);
+            this.numericUpDownTimeout.Size = new System.Drawing.Size(48, 20);
             this.numericUpDownTimeout.TabIndex = 5;
             this.numericUpDownTimeout.Value = new decimal(new int[] {
             45,
@@ -292,49 +292,49 @@ namespace HousingCheck
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(8, 86);
+            this.label1.Location = new System.Drawing.Point(8, 93);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(209, 12);
+            this.label1.Size = new System.Drawing.Size(211, 13);
             this.label1.TabIndex = 4;
             this.label1.Text = "最后记录时间早于此分钟数就不上报：";
             // 
             // buttonCopyToClipboard
             // 
-            this.buttonCopyToClipboard.Location = new System.Drawing.Point(216, 20);
+            this.buttonCopyToClipboard.Location = new System.Drawing.Point(216, 22);
             this.buttonCopyToClipboard.Name = "buttonCopyToClipboard";
-            this.buttonCopyToClipboard.Size = new System.Drawing.Size(98, 23);
+            this.buttonCopyToClipboard.Size = new System.Drawing.Size(98, 25);
             this.buttonCopyToClipboard.TabIndex = 0;
             this.buttonCopyToClipboard.Text = "复制到剪贴板";
             this.buttonCopyToClipboard.UseVisualStyleBackColor = true;
             // 
             // buttonSaveToFile
             // 
-            this.buttonSaveToFile.Location = new System.Drawing.Point(111, 20);
+            this.buttonSaveToFile.Location = new System.Drawing.Point(111, 22);
             this.buttonSaveToFile.Name = "buttonSaveToFile";
-            this.buttonSaveToFile.Size = new System.Drawing.Size(98, 23);
+            this.buttonSaveToFile.Size = new System.Drawing.Size(98, 25);
             this.buttonSaveToFile.TabIndex = 0;
-            this.buttonSaveToFile.Text = "保存到文本文件";
+            this.buttonSaveToFile.Text = "保存到文件";
             this.buttonSaveToFile.UseVisualStyleBackColor = true;
             // 
             // buttonUploadOnce
             // 
-            this.buttonUploadOnce.Location = new System.Drawing.Point(6, 20);
+            this.buttonUploadOnce.Location = new System.Drawing.Point(6, 22);
             this.buttonUploadOnce.Name = "buttonUploadOnce";
-            this.buttonUploadOnce.Size = new System.Drawing.Size(98, 23);
+            this.buttonUploadOnce.Size = new System.Drawing.Size(98, 25);
             this.buttonUploadOnce.TabIndex = 0;
             this.buttonUploadOnce.Text = "手动上报一次";
             this.buttonUploadOnce.UseVisualStyleBackColor = true;
             // 
             // PluginControl
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Controls.Add(this.groupBoxControl);
             this.Controls.Add(this.groupBoxLog);
             this.Controls.Add(this.groupBoxUpload);
             this.Controls.Add(this.groupBoxTable);
             this.Name = "PluginControl";
-            this.Size = new System.Drawing.Size(940, 655);
+            this.Size = new System.Drawing.Size(940, 710);
             this.groupBoxTable.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
             this.groupBoxUpload.ResumeLayout(false);
