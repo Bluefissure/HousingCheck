@@ -233,7 +233,7 @@ namespace HousingCheck
         void NetworkReceived(string connection, long epoch, byte[] message)
         {
             var opcode = BitConverter.ToUInt16(message, 18);
-            if (opcode != 0x164 && message.Length != 2440) return;
+            if (opcode != 0x11c && message.Length != 2440) return;
 
             control.Invoke(new Action<byte[]>(NetworkReceivedSync), message);
         }
