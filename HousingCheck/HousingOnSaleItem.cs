@@ -108,23 +108,33 @@ namespace HousingCheck
                 return true;
             }
 
-            //这里对比价格应该用<=，不然降价后会重复记录
+            //因为加了状态信息，所以不需要再对比售价
             return (obj.Area == Area
                         && obj.Slot == Slot
-                        && obj.Id == Id
-                        && obj.Price <= Price);
+                        && obj.Id == Id);
         }
 
         public void Update(HousingItem item)
         {
             if(item.Area == Area
                 && item.Slot == Slot
-                && item.Id == Id
-                && item.Price <= Price)
+                && item.Id == Id)
             {
                 Price = item.Price;
                 ExistenceTime = DateTime.Now;
                 CurrentStatus = item.IsEmpty;
+            }
+        }
+
+        public void Update(HousingOnSaleItem item)
+        {
+            if (item.Area == Area
+                && item.Slot == Slot
+                && item.Id == Id)
+            {
+                Price = item.Price;
+                ExistenceTime = DateTime.Now;
+                CurrentStatus = item.CurrentStatus;
             }
         }
     }

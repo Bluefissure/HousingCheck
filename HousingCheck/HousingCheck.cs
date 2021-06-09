@@ -30,18 +30,72 @@ namespace HousingCheck
 
     public class HousingCheck : IActPluginV1
     {
+        public const int OPCODE = 894;
+        /// <summary>
+        /// 房屋列表，用于和控件双向绑定
+        /// </summary>
         public ObservableCollection<HousingOnSaleItem> HousingList = new ObservableCollection<HousingOnSaleItem>();
-        public BindingSource bindingSource1;
+        
+        /// <summary>
+        /// 库啵，库啵啵？
+        /// </summary>
+        public BindingSource housingBindingSource;
+
+        /// <summary>
+        /// 插件对象
+        /// </summary>
         FFXIV_ACT_Plugin.FFXIV_ACT_Plugin ffxivPlugin;
+
+        List<(DateTime, string)> LogQueue = new List<(DateTime, string)>();
+
+        /// <summary>
+        /// 是否加载完成
+        /// </summary>
         bool initialized = false;
+
+        /// <summary>
+        /// 有手动上报任务
+        /// </summary>
         bool ManualUpload = false;
-        //上报队列
+
+        /// <summary>
+        /// 有自动上报任务
+        /// </summary>
         bool HousingListUpdated = false;
-        Dictionary<Tuple<HouseArea, int>, HousingSlotSnapshot> AutoUploadSnapshot = new Dictionary<Tuple<HouseArea, int>, HousingSlotSnapshot>();
-        long LastOperateTime = 0;
-        long AutoSaveAfter = 20; //20秒无操作自动保存
+
+        /// <summary>
+        /// 房区快照
+        /// </summary>
         HousingSnapshotStorage SnapshotStorage = new HousingSnapshotStorage();
+
+        /// <summary>
+        /// 进行房区快照上报用的存储
+        /// </summary>
+        Dictionary<Tuple<HouseArea, int>, HousingSlotSnapshot> WillUploadSnapshot = new Dictionary<Tuple<HouseArea, int>, HousingSlotSnapshot>();
+        
+        /// <summary>
+        /// 用户上次操作的时间
+        /// </summary>
+        long LastOperateTime = 0;
+
+        /// <summary>
+        /// 无操作自动保存的时间
+        /// </summary>
+        long AutoSaveAfter = 20;
+
+        /// <summary>
+        /// 自动保存worker
+        /// </summary>
         private BackgroundWorker AutoSaveThread;
+
+        /// <summary>
+        /// Log队列
+        /// </summary>
+        private BackgroundWorker LogQueueWorker;
+
+        /// <summary>
+        /// 状态信息
+        /// </summary>
         Label statusLabel;
         PluginControl control; 
 
@@ -71,6 +125,7 @@ namespace HousingCheck
                 var networkReceivedDelegate = Delegate.CreateDelegate(networkReceivedDelegateType, (object)this, "NetworkReceived", true);
                 subs.GetType().GetEvent("NetworkReceived").RemoveEventHandler(subs, networkReceivedDelegate);
                 AutoSaveThread.CancelAsync();
+                LogQueueWorker.CancelAsync();
                 control.SaveSettings();
                 SaveHousingList();
                 statusLabel.Text = "Exit :|";
@@ -87,9 +142,14 @@ namespace HousingCheck
             GetFfxivPlugin();
             control = new PluginControl();
             pluginScreenSpace.Text = "房屋信息记录";
-            bindingSource1 = new BindingSource { DataSource = HousingList };
-            control.dataGridView1.DataSource = bindingSource1;
+            housingBindingSource = new BindingSource { DataSource = HousingList };
+            control.dataGridView1.DataSource = housingBindingSource;
             control.dataGridView1.UserDeletedRow += OnTableUpdated;
+            foreach(DataGridViewColumn col in control.dataGridView1.Columns)
+            {
+                col.SortMode = DataGridViewColumnSortMode.Automatic;
+            }
+
             control.Dock = DockStyle.Fill;
             pluginScreenSpace.Controls.Add(control);
 
@@ -103,8 +163,16 @@ namespace HousingCheck
             {
                 WorkerSupportsCancellation = true
             };
-            AutoSaveThread.DoWork += AutoSaveWorker;
+            AutoSaveThread.DoWork += RunAutoUploadWorker;
             AutoSaveThread.RunWorkerAsync();
+
+            LogQueueWorker = new BackgroundWorker
+            {
+                WorkerSupportsCancellation = true
+            };
+            LogQueueWorker.DoWork += RunLogQueueWorker;
+            LogQueueWorker.RunWorkerAsync();
+
             statusLabel.Text = "Working :D";
             control.LoadSettings();
             control.buttonUploadOnce.Click += ButtonUploadOnce_Click;
@@ -115,13 +183,21 @@ namespace HousingCheck
             LoadHousingList();
         }
 
+        /// <summary>
+        /// 播放提示音
+        /// </summary>
+        void PlayAlert()
+        {
+            Console.Beep(3000, 1000);
+        }
+
         int GetServerId()
         {
             return (int)ffxivPlugin.DataRepository.GetCombatantList()
                 .FirstOrDefault(x => x.ID == ffxivPlugin.DataRepository.GetCurrentPlayerID()).CurrentWorldID;
         }
 
-        void Log(string type, string message)
+        void Log(string type, string message, bool important = false)
         {
             var time = (DateTime.Now).ToString("HH:mm:ss");
             var text = $"[{time}] [{type}] {message.Trim()}";
@@ -129,12 +205,16 @@ namespace HousingCheck
             control.textBoxLog.SelectionStart = control.textBoxLog.TextLength;
             control.textBoxLog.ScrollToCaret(); 
             text = $"00|{DateTime.Now.ToString("O")}|0|HousingCheck-{message}|";        //解析插件数据格式化
-            ActGlobals.oFormActMain.ParseRawLogLine(false, DateTime.Now, $"{text}");    //插入ACT日志
+            //ActGlobals.oFormActMain.ParseRawLogLine(true, DateTime.Now, $"{text}");
+            if (important)
+            {
+                LogQueue.Add((DateTime.Now, text));
+            }
         }
 
         void Log(string type, Exception ex, string msg = "")
         {
-            Log(type, msg + ex.ToString());
+            Log(type, msg + ex.ToString(), false);
         }
 
         string HousingListToJson()
@@ -144,98 +224,92 @@ namespace HousingCheck
                 );
         }
 
-        void NetworkReceivedSync(byte[] message)
+        void NetworkReceived(string connection, long epoch, byte[] message)
         {
+            var opcode = BitConverter.ToUInt16(message, 18);
+            //if (message.Length == 2440) Log("Debug", "opcode=" + opcode);
+            if (opcode != OPCODE || message.Length != 2440) return;
+
             HousingSlotSnapshot snapshot;
+            List<HousingOnSaleItem> updatedHousingList = new List<HousingOnSaleItem>();
             try
             {
                 //解析数据包
                 snapshot = new HousingSlotSnapshot(message);
                 snapshot.ServerId = GetServerId();
-                /*foreach(var house in snapshot.HouseList.Values)
-                {
-                    Log("Debug", house.Id + ": " + house.Flags.ToString());
-                }*/
                 //存入存储
                 SnapshotStorage.Insert(snapshot);
-                AutoUploadSnapshot[new Tuple<HouseArea, int>(snapshot.Area, snapshot.Slot)] = snapshot;
+                WillUploadSnapshot[new Tuple<HouseArea, int>(snapshot.Area, snapshot.Slot)] = snapshot;
 
-                foreach (HousingOnSaleItem item in HousingList)
+                //本区房屋列表
+                var housingList = snapshot.HouseList;
+
+                //本区原先在售的房屋列表
+                List<HousingOnSaleItem> oldOnSaleList = new List<HousingOnSaleItem>();
+                foreach(HousingOnSaleItem housing in HousingList)
                 {
-                    if (item.Area == snapshot.Area && item.Slot == snapshot.Slot)
+                    if (housing.Area == snapshot.Area && housing.Slot == snapshot.Slot)
                     {
-                        item.CurrentStatus = false;
+                        oldOnSaleList.Add(housing);
                     }
                 }
 
-                HousingItem[] onSaleList = snapshot.GetOnSale();
-
-                foreach (var item in HousingList)
+                foreach (var a in housingList)
                 {
-                    if (item.Area == snapshot.Area && item.Slot == snapshot.Slot)
+                    HousingItem house = a.Value;
+                    HousingOnSaleItem onSaleItem = new HousingOnSaleItem(house);
+                    bool isExists = false;
+
+                    //查找并更新原有房屋
+                    var oldOnSaleItems = oldOnSaleList.Where(x => x.Id == house.Id);
+                    foreach(var oldOnSaleItem in oldOnSaleItems)
                     {
-                        if (onSaleList.Where(x => x.Slot == item.Slot && x.IsEmpty)
-                            .ToArray().Length == 0)
+                        updatedHousingList.Add(onSaleItem);
+                        isExists = true;
+                    }
+
+                    if (isExists)
+                    {
+                        HousingListUpdated = true;
+                    }
+
+                    if (house.IsEmpty)
+                    {
+                        Log("Info", string.Format("{0} 第{1}区 {2}号 {3}房在售 当前价格: {4}",
+                            onSaleItem.AreaStr, onSaleItem.DisplaySlot, onSaleItem.DisplayId,
+                            onSaleItem.SizeStr, onSaleItem.Price), true);
+
+                        if (!isExists)
                         {
-                            //空房已消失
-                            item.CurrentStatus = false;
+                            if (onSaleItem.Size == HouseSize.M || onSaleItem.Size == HouseSize.L)
+                            {
+                                PlayAlert();
+                            }
+
+                            updatedHousingList.Add(onSaleItem);
                             HousingListUpdated = true;
-                            try
-                            {
-                                bindingSource1.ResetItem(HousingList.IndexOf(item));
-                            }
-                            catch (Exception ex)
-                            {
-                                Log("Error", ex, "刷新列表出错：");
-                            }
+                        }
+                        else
+                        {
+                            Log("Info", "重复土地，已更新。");
                         }
                     }
                 }
 
-                int listIndex;
-                //更新空房列表
-                foreach (HousingItem house in onSaleList)
-                {
-                    HousingOnSaleItem onSaleItem = new HousingOnSaleItem(house);
-                    Log("Info", string.Format("{0} 第{1}区 {2}号 {3}房在售 当前价格: {4}",
-                        onSaleItem.AreaStr, onSaleItem.DisplaySlot, onSaleItem.DisplayId,
-                        onSaleItem.SizeStr, onSaleItem.Price));
-
-                    if (onSaleItem.Size == HouseSize.M || onSaleItem.Size == HouseSize.L)
-                    {
-                        Console.Beep(3000, 1000);
-                    }
-
-                    if ((listIndex = HousingList.IndexOf(onSaleItem)) != -1)
-                    {
-                        HousingList[listIndex].Update(house);
-                        Log("Info", "重复土地，已更新。");
-                    }
-                    else
-                    {
-                        bindingSource1.Add(onSaleItem);
-                    }
-                    HousingListUpdated = true;
-                }
                 LastOperateTime = new DateTimeOffset(DateTime.Now).ToUnixTimeSeconds(); //更新上次操作的时间
 
                 Log("Info", string.Format("{0} 第{1}区查询完成",
                     HousingItem.GetHouseAreaStr(snapshot.Area),
-                    snapshot.Slot + 1));     //输出翻页日志
+                    snapshot.Slot + 1), true);     //输出翻页日志
+
+                //刷新UI
+                control.Invoke(new Action<List<HousingOnSaleItem>>(UpdateTable), updatedHousingList);
             }
             catch (Exception ex)
             {
                 Log("Error", ex, "查询房屋列表出错：");
                 return;
             }
-        }
-
-        void NetworkReceived(string connection, long epoch, byte[] message)
-        {
-            var opcode = BitConverter.ToUInt16(message, 18);
-            if (opcode != 0x11c && message.Length != 2440) return;
-
-            control.Invoke(new Action<byte[]>(NetworkReceivedSync), message);
         }
 
         private void ButtonUploadOnce_Click(object sender, EventArgs e)
@@ -282,7 +356,7 @@ namespace HousingCheck
                 var list = JsonConvert.DeserializeObject<HousingOnSaleItem[]>(jsonStr);
                 foreach(var item in list)
                 {
-                    bindingSource1.Add(item);
+                    housingBindingSource.Add(item);
                 }
                 Log("Info", "已恢复上次保存的房屋列表");
             }
@@ -342,12 +416,52 @@ namespace HousingCheck
             return stringBuilder.ToString();
         }
 
+        public void UpdateTable(List<HousingOnSaleItem> items)
+        {
+            foreach(HousingOnSaleItem item in items)
+            {
+                int listIndex;
+                if((listIndex = HousingList.IndexOf(item)) != -1){
+                    housingBindingSource[listIndex] = item;
+                }
+                else
+                {
+                    housingBindingSource.Add(item);
+                }
+            }
+        }
+
         private void OnTableUpdated(object sender, DataGridViewRowEventArgs e)
         {
             HousingListUpdated = true;
+            LastOperateTime = new DateTimeOffset(DateTime.Now).ToUnixTimeSeconds(); //更新上次操作的时间
         }
 
-        private void AutoSaveWorker(object sender, DoWorkEventArgs e)
+        private void RunLogQueueWorker(object sender, DoWorkEventArgs e)
+        {
+            while (true)
+            {
+                if (AutoSaveThread.CancellationPending)
+                {
+                    break;
+                }
+                if (LogQueue.Count > 0)
+                {
+                    while(LogQueue.Count > 0)
+                    {
+                        var data = LogQueue.First();
+                        LogQueue.RemoveAt(0);
+                        ActGlobals.oFormActMain.ParseRawLogLine(false, data.Item1, data.Item2);
+                    }
+                }
+                else
+                {
+                    Thread.Sleep(100);
+                }
+            }
+        }
+
+        private void RunAutoUploadWorker(object sender, DoWorkEventArgs e)
         {
             long actionTime;
             bool dataUpdated;
@@ -362,28 +476,23 @@ namespace HousingCheck
                 {
                     break;
                 }
-                Monitor.Enter(this);
                 actionTime = LastOperateTime + AutoSaveAfter;
                 dataUpdated = HousingListUpdated;
-                snapshotCount = AutoUploadSnapshot.Count;
+                snapshotCount = WillUploadSnapshot.Count;
                 autoUpload = control.upload;
                 manualUpload = ManualUpload;
                 uploadSnapshot = control.EnableUploadSnapshot;
                 apiVersion = control.UploadApiVersion;
-                Monitor.Exit(this);
+
                 if (manualUpload)
                 {
                     UploadOnSaleList(apiVersion);
-                    Monitor.Enter(this);
                     HousingListUpdated = false;
-                    Monitor.Exit(this);
                     if (apiVersion == ApiVersion.V2 && uploadSnapshot && snapshotCount > 0)
                     {
                         UploadSnapshot();
                     }
-                    Monitor.Enter(this);
                     ManualUpload = false;
-                    Monitor.Exit(this);
                 }
                 else if (actionTime <= new DateTimeOffset(DateTime.Now).ToUnixTimeSeconds())
                 {
@@ -392,18 +501,14 @@ namespace HousingCheck
                         if (dataUpdated)
                         {
                             //保存列表文件
-                            Monitor.Enter(this);
                             SaveHousingList();
                             Log("Info", "房屋信息已保存");
-                            Monitor.Exit(this);
                             if (autoUpload)
                             {
                                 //自动上报
                                 UploadOnSaleList(apiVersion);
                             }
-                            Monitor.Enter(this);
                             HousingListUpdated = false;
-                            Monitor.Exit(this);
                         }
 
                         if (autoUpload && apiVersion == ApiVersion.V2 && 
@@ -421,7 +526,6 @@ namespace HousingCheck
         public bool UploadData(string type, string postContent, string mime = "application/json")
         {
             var wb = new WebClient();
-            Monitor.Enter(this);
             var token = control.UploadToken.Trim();
             if (token != "")
             {
@@ -440,7 +544,6 @@ namespace HousingCheck
                     url = control.UploadUrl.TrimEnd('/') + "/" + type;
                     break;
             }
-            Monitor.Exit(this);
             try
             {
                 var response = wb.UploadData(url, "POST",
@@ -458,9 +561,7 @@ namespace HousingCheck
                         } 
                         else
                         {
-                            Monitor.Enter(this);
                             Log("Error", "上传出错：" + jsonRes["errorMessage"]);
-                            Monitor.Exit(this);
                         }
                     } 
                     else
@@ -471,25 +572,20 @@ namespace HousingCheck
                         }
                         else
                         {
-                            Monitor.Enter(this);
                             Log("Error", "上传出错：" + res);
-                            Monitor.Exit(this);
                         }
                     }
                 }
             }
             catch(Exception ex)
             {
-                Monitor.Enter(this);
                 Log("Error", ex, "上传出错：");
-                Monitor.Exit(this);
             }
             return false;
         }
 
         private void UploadOnSaleList(ApiVersion apiVersion = ApiVersion.V2)
         {
-            Monitor.Enter(this);
             string postContent = "";
             string mime = "application/json";
             switch (apiVersion)
@@ -508,14 +604,11 @@ namespace HousingCheck
             }
             //Log("Debug", postContent);
             Log("Info", "正在上传空房列表");
-            Monitor.Exit(this);
             bool res = UploadData("info", postContent, mime);
 
             if (res)
             {
-                Monitor.Enter(this);
                 Log("Info", "房屋列表上报成功");
-                Monitor.Exit(this);
             }
             else
             {
@@ -527,22 +620,18 @@ namespace HousingCheck
         {
             try
             {
-                Monitor.Enter(this);
                 List<HousingSlotSnapshotJSONObject> snapshotJSONObjects = new List<HousingSlotSnapshotJSONObject>();
-                foreach(var snapshot in AutoUploadSnapshot.Values)
+                foreach(var snapshot in WillUploadSnapshot.Values)
                 {
                     snapshotJSONObjects.Add(snapshot.ToJsonObject());
                 }
                 string json = JsonConvert.SerializeObject(snapshotJSONObjects);
                 Log("Info", "正在上传房区快照");
-                AutoUploadSnapshot.Clear();
-                Monitor.Exit(this);
+                WillUploadSnapshot.Clear();
                 bool res = UploadData("info", json);
                 if (res)
                 {
-                    Monitor.Enter(this);
                     Log("Info", "房区快照上报成功");
-                    Monitor.Exit(this);
                 }
                 else
                 {
