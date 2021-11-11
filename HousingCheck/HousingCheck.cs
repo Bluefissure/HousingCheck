@@ -142,12 +142,18 @@ namespace HousingCheck
                 area = "高脚孤丘";
             else if (data_header[4] == 0x81)
                 area = "白银乡";
+            else
+                return;
             int slot = data_header[2];
+            if (slot > 30)
+                return;
             for (int i = 8; i < data_list.Length; i += 40)
             {
                 var house_id = (i - 8) / 40;
                 var name_header = data_list.SubArray(i, 8);
                 int price = BitConverter.ToInt32(name_header, 0);
+                if (price < 0 || price > 100000000)
+                    return;
                 string size = (price > 30000000) ? "L" : ((price > 10000000) ? "M" : "S");
                 var name_array = data_list.SubArray(i + 8, 32);
                 if (name_array[0] == 0)
@@ -192,7 +198,7 @@ namespace HousingCheck
         void NetworkReceived(string connection, long epoch, byte[] message)
         {
             var opcode = BitConverter.ToUInt16(message, 18);
-            if (opcode != 284 && message.Length != 2440) return;
+            if (opcode != 0x0292) return;
             control.Invoke(new Action<byte[]>(NetworkReceivedSync), message);
         }
 
