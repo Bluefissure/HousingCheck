@@ -38,14 +38,17 @@
     <Reference Include="Advanced Combat Tracker">
       <HintPath>E:\Game\FFXIVTools\ACTD\DLibs\Advanced Combat Tracker.dll</HintPath>
     </Reference>
-    <Reference Include="FFXIV_ACT_Plugin">
-      <HintPath>..\..\universalis_act_plugin\UniversalisPlugin\SDK\FFXIV_ACT_Plugin.dll</HintPath>
+    <Reference Include="FFXIV_ACT_Plugin, Version=2.0.5.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>E:\Game\FFXIVTools\ACTD\Plugins\FFXIV_ACT_Plugin.dll</HintPath>
     </Reference>
-    <Reference Include="FFXIV_ACT_Plugin.Common">
-      <HintPath>..\..\universalis_act_plugin\UniversalisPlugin\SDK\FFXIV_ACT_Plugin.Common.dll</HintPath>
+    <Reference Include="FFXIV_ACT_Plugin.Common, Version=2.0.4.9, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>E:\Game\FFXIVTools\FFXIV_ACT_Plugin_SDK\FFXIV_ACT_Plugin.Common.dll</HintPath>
     </Reference>
-    <Reference Include="FFXIV_ACT_Plugin.Config">
-      <HintPath>..\..\universalis_act_plugin\UniversalisPlugin\SDK\FFXIV_ACT_Plugin.Config.dll</HintPath>
+    <Reference Include="FFXIV_ACT_Plugin.Config, Version=2.0.4.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>E:\Game\FFXIVTools\FFXIV_ACT_Plugin_SDK\FFXIV_ACT_Plugin.Config.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.13.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>

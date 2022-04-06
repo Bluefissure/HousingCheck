@@ -50,7 +50,7 @@ namespace HousingCheck
             var plugins = ActGlobals.oFormActMain.ActPlugins;
             foreach (var plugin in plugins)
                 if (plugin.pluginFile.Name.ToUpper().Contains("FFXIV_ACT_Plugin".ToUpper()) &&
-                    plugin.lblPluginStatus.Text.ToUpper().Contains("FFXIV Plugin Started.".ToUpper()))
+                    plugin.lblPluginStatus.Text.ToUpper().Contains("Started.".ToUpper()))
                     ffxivPlugin = (FFXIV_ACT_Plugin.FFXIV_ACT_Plugin)plugin.pluginObj;
 
             if (ffxivPlugin == null)
@@ -198,7 +198,7 @@ namespace HousingCheck
         void NetworkReceived(string connection, long epoch, byte[] message)
         {
             var opcode = BitConverter.ToUInt16(message, 18);
-            if (opcode != 0x01AA) return;
+            if (opcode != 0x0208) return;
             control.Invoke(new Action<byte[]>(NetworkReceivedSync), message);
         }
 
